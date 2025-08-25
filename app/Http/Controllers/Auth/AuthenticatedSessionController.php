@@ -45,9 +45,12 @@ class AuthenticatedSessionController extends Controller
         }
 
         if (Auth::user()->role === 'supervisor') {
-            return redirect()->intended(route('supervisor.projects'));
+            return redirect()->intended(route('supervisor.dashboard'));
         }
 
+        if (Auth::user()->role === 'student') {
+            return redirect()->intended(route('student.dashboard'));
+        }
         // Default redirect for all other roles
         return redirect()->intended(route('dashboard'));
     }

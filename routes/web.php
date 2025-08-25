@@ -12,25 +12,18 @@ use App\Http\Controllers\Admin\DocumentTemplateController;
 use App\Models\DocumentTemplate;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DashboardController as MainDashboardController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Supervisor\DashboardController as SupervisorDashboardController;
 
 // --- Publicly Accessible Routes ---
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    $user = Auth::user();
-    $viewData = [];
-
-    if ($user->role === 'student') {
-        $viewData['project'] = Project::where('user_id', $user->id)->first();
-    }
-
-    // SDM-4: expose templates on dashboard
-    $viewData['templates'] = DocumentTemplate::all();
-
-    return view('dashboard', $viewData);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [MainDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // --- General Authenticated Routes ---
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -56,6 +49,8 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::get('/projects/{project}/scope/create', [ProjectController::class, 'createScopeDocument'])->name('projects.scope.create');
     Route::post('/projects/{project}/scope', [ProjectController::class, 'storeScopeDocument'])->name('projects.scope.store');
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
+    ->name('student.dashboard');
 });
 
 // --- Supervisor Specific Routes ---
@@ -66,6 +61,8 @@ Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
     Route::patch('/supervisor/projects/{project}/complete', [SupervisorController::class, 'complete'])->name('supervisor.projects.complete');
     Route::get('/supervisor/history', [SupervisorController::class, 'history'])->name('supervisor.history');
     Route::get('/supervisor/profile', [SupervisorController::class, 'editProfile'])->name('supervisor.profile.edit');
+    Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])
+    ->name('supervisor.dashboard');
 });
 
 // --- Admin Routes ---
