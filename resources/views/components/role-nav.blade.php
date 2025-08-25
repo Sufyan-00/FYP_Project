@@ -1,19 +1,63 @@
-@php($role = auth()->user()?->role)
-<nav class="flex items-center gap-4 text-sm">
-    @if ($role === 'student')
-        <a href="{{ route('student.dashboard') }}" class="text-blue-700 hover:underline">Dashboard</a>
-        <a href="{{ route('projects.index') }}" class="hover:underline">My Projects</a>
-        <a href="{{ route('supervisors.directory') }}" class="hover:underline">Supervisors</a>
-    @elseif ($role === 'supervisor')
-        <a href="{{ route('supervisor.dashboard') }}" class="text-blue-700 hover:underline">Dashboard</a>
-        <a href="{{ route('supervisor.projects') }}" class="hover:underline">Assigned Projects</a>
-        <a href="{{ route('supervisor.history') }}" class="hover:underline">History</a>
-    @elseif ($role === 'admin')
-        <a href="{{ route('admin.dashboard') }}" class="text-blue-700 hover:underline">Dashboard</a>
-        <a href="{{ route('admin.projects.index') }}" class="hover:underline">Projects</a>
-        <a href="{{ route('admin.templates.index') }}" class="hover:underline">Templates</a>
-        <a href="{{ route('admin.users.index') }}" class="hover:underline">Users</a>
-    @endif
+@props(['class' => ''])
 
-    <a href="{{ route('profile.edit') }}" class="hover:underline">Profile</a>
-</nav>
+@php
+    $role = auth()->user()?->role;
+
+    // Map to per-role dashboards; fallback to default 'dashboard'
+    $dashboardRoutes = [
+        'student' => 'student.dashboard',
+        'supervisor' => 'supervisor.dashboard',
+        'admin' => 'admin.dashboard',
+    ];
+    $dashboardRoute = $dashboardRoutes[$role] ?? 'dashboard';
+@endphp
+
+<div {{ $attributes->merge(['class' => $class]) }}>
+    @if ($role === 'student')
+        <x-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">
+            Dashboard
+        </x-nav-link>
+
+        <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')">
+            My Projects
+        </x-nav-link>
+
+        <x-nav-link :href="route('supervisors.directory')" :active="request()->routeIs('supervisors.directory')">
+            Supervisors
+        </x-nav-link>
+
+    @elseif ($role === 'supervisor')
+        <x-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">
+            Dashboard
+        </x-nav-link>
+
+        <x-nav-link :href="route('supervisor.projects')" :active="request()->routeIs('supervisor.projects')">
+            Assigned Projects
+        </x-nav-link>
+
+        <x-nav-link :href="route('supervisor.history')" :active="request()->routeIs('supervisor.history')">
+            History
+        </x-nav-link>
+
+        <x-nav-link :href="route('supervisor.profile.edit')" :active="request()->routeIs('supervisor.profile.edit')">
+            My Profile
+        </x-nav-link>
+
+    @elseif ($role === 'admin')
+        <x-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">
+            Dashboard
+        </x-nav-link>
+
+        <x-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
+            Projects
+        </x-nav-link>
+
+        <x-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">
+            Templates
+        </x-nav-link>
+
+        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+            Users
+        </x-nav-link>
+    @endif
+</div>
