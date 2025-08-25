@@ -4,8 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupervisorController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Http\Controllers\Admin\ScopeDocumentController as AdminScopeDocumentController;
 use App\Http\Controllers\Admin\DocumentTemplateController;
@@ -61,15 +61,19 @@ Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
     Route::patch('/supervisor/projects/{project}/complete', [SupervisorController::class, 'complete'])->name('supervisor.projects.complete');
     Route::get('/supervisor/history', [SupervisorController::class, 'history'])->name('supervisor.history');
     Route::get('/supervisor/profile', [SupervisorController::class, 'editProfile'])->name('supervisor.profile.edit');
+    Route::patch('/supervisor/profile', [SupervisorController::class, 'updateProfile'])->name('supervisor.profile.update');
     Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])
     ->name('supervisor.dashboard');
 });
 
 // --- Admin Routes ---
 Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
-    Route::get('users/toggle-status/{user}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('users', AdminUserController::class)->only(['index', 'edit', 'update']);
+    Route::patch('/users/{user}/status', [AdminUserController::class, 'toggleStatus'])->name('users.toggleStatus');
+    Route::get('/users/upload', [AdminUserController::class, 'showUploadForm'])->name('users.upload.form');
+    Route::post('/users/upload', [AdminUserController::class, 'processUpload'])->name('users.upload.process');
+    Route::get('/users/upload/template', [AdminUserController::class, 'downloadTemplate'])->name('users.template.download');
 
     Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
 
@@ -79,9 +83,9 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
         ->names('templates');
 
     // Scope Document versioning mgmt (existing)
-    Route::get('scope-documents', [AdminScopeDocumentController::class, 'index'])->name('scope-documents.index');
-    Route::get('scope-documents/create', [AdminScopeDocumentController::class, 'create'])->name('scope-documents.create');
-    Route::post('scope-documents', [AdminScopeDocumentController::class, 'store'])->name('scope-documents.store');
+    Route::get('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'index'])->name('projects.scope-documents.index');
+    Route::get('/projects/{project}/scope-documents/create', [AdminScopeDocumentController::class, 'create'])->name('projects.scope-documents.create');
+    Route::post('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'store'])->name('projects.scope-documents.store');
 });
 
 require __DIR__.'/auth.php';
