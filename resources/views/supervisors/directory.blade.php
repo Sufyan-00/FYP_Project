@@ -1,47 +1,70 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Supervisor Directory') }}
-        </h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Supervisor Directory</h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Available Supervisors</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @forelse ($supervisors as $supervisor)
-                            {{-- This check prevents the page from crashing if a supervisor somehow has no profile --}}
-                            @if ($supervisor->supervisorProfile)
-                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow">
-                                    <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ $supervisor->name }}</h4>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $supervisor->email }}</p>
-                                    
-                                    <div class="mt-4">
-                                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Research Interests:</p>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $supervisor->supervisorProfile->research_interests ?? 'Not specified' }}
-                                        </p>
-                                    </div>
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-                                    <div class="mt-2">
-                                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Available Slots:</p>
-                                        <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                                            {{-- This is the line that was causing the error. It's now safe. --}}
-                                            {{ $supervisor->supervisorProfile->available_slots }}
-                                        </p>
-                                    </div>
-                                </div>
-                            @endif
-                        @empty
-                            <div class="col-span-full text-center py-8">
-                                <p class="text-gray-500 dark:text-gray-400">No supervisors are available at this time.</p>
-                            </div>
-                        @endforelse
-                    </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form method="GET" class="flex gap-3">
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ $q }}"
+                            placeholder="Search by name or email"
+                            class="w-full sm:w-80 border-gray-300 rounded-md"
+                        />
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Search
+                        </button>
+                        @if ($q !== '')
+                            <a href="{{ route('supervisors.directory') }}" class="px-4 py-2 border rounded hover:bg-gray-50">
+                                Clear
+                            </a>
+                        @endif
+                    </form>
                 </div>
             </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    @if ($supervisors->count() === 0)
+                        <p class="text-gray-600">No supervisors found.</p>
+                    @else
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach ($supervisors as $s)
+                                <div class="border rounded-md p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="font-semibold">{{ $s->name }}</div>
+                                        <span class="text-xs text-gray-500">{{ $s->email }}</span>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-600">
+                                        Research Interests:
+                                        <p class="font-medium">
+                                            {{ $s->supervisorProfile->research_interests ?? '—' }}
+                                        </p>
+                                    </div>
+                                    <div class="mt-2 text-sm text-gray-600">
+                                        Available slots:
+                                        <span class="font-medium">
+                                            {{ optional($s->supervisorProfile)->available_slots ?? '—' }}
+                                        </span>
+                                    </div>
+                                    {{-- Add more fields if you have them, e.g., department --}}
+                                    {{-- <div class="text-sm text-gray-600">Department: {{ $s->department ?? '—' }}</div> --}}
+                                </div>
+                            @endforeach
+                        </div>
+    
+                        <div class="mt-6">
+                            {{ $supervisors->links() }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+
         </div>
     </div>
 </x-app-layout>

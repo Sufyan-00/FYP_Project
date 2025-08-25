@@ -155,18 +155,40 @@ class SupervisorController extends Controller
         return redirect()->route('supervisor.profile.edit')->with('success', 'Profile updated successfully!');
     }
 
-    public function directory()
-    {
-        // This query now ensures two things:
-        // 1. It only fetches users with the 'supervisor' role.
-        // 2. It only includes supervisors who HAVE a related profile record (`whereHas`).
-        // 3. It eager loads the profile to prevent performance issues (`with`).
-        $supervisors = User::where('role', 'supervisor')
-                            ->whereHas('supervisorProfile')
-                            ->with('supervisorProfile')
-                            ->orderBy('name')
-                            ->get();
+    // public function directory()
+    // {
+    //     // This query now ensures two things:
+    //     // 1. It only fetches users with the 'supervisor' role.
+    //     // 2. It only includes supervisors who HAVE a related profile record (`whereHas`).
+    //     // 3. It eager loads the profile to prevent performance issues (`with`).
+    //     $supervisors = User::where('role', 'supervisor')
+    //                         ->whereHas('supervisorProfile')
+    //                         ->with('supervisorProfile')
+    //                         ->orderBy('name')
+    //                         ->get();
 
-        return view('supervisors.directory', ['supervisors' => $supervisors]);
+    //     return view('supervisors.directory', ['supervisors' => $supervisors]);
+    // }
+
+    public function directory(Request $request)
+    {
+        $q = trim($request->get('q', ''));
+
+        $query = User::where('role', 'supervisor')
+            ->with('supervisorProfile');
+
+        if ($q !== '') {
+            $query->where(function ($qq) use ($q) {
+                $qq->where('name', 'like', "%{$q}%")
+                ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        $supervisors = $query->orderBy('name')->paginate(12)->withQueryString();
+
+        return view('supervisors.directory', [
+            'supervisors' => $supervisors,
+            'q' => $q,
+        ]);
     }
 }
