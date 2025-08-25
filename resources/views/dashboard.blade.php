@@ -30,6 +30,21 @@
                                     <dt class="text-sm font-medium text-gray-500 truncate">Notifications</dt>
                                     <dd class="mt-1 text-3xl font-semibold text-gray-900">3 Unread</dd>
                                 </div>
+                                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                                <div class="p-6">
+                                    <h3 class="text-lg font-medium text-gray-900">Document Templates</h3>
+                                    <ul class="mt-3 space-y-2">
+                                        @forelse ($templates as $template)
+                                            <li class="flex justify-between items-center p-2 border rounded-md">
+                                                <span>{{ $template->name }}</span>
+                                                <a class="text-blue-600 hover:text-blue-800" href="{{ route('templates.download', $template) }}">Download</a>
+                                            </li>
+                                        @empty
+                                            <li class="text-gray-500">No templates available yet.</li>
+                                        @endforelse
+                                    </ul>
+                                </div>
+                            </div>
                             </dl>
                         </div>
                     

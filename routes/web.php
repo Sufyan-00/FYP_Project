@@ -13,93 +13,78 @@ use App\Models\DocumentTemplate;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 
-
 // --- Publicly Accessible Routes ---
 Route::get('/', function () {
     return view('welcome');
 });
+
 Route::get('/dashboard', function () {
     $user = Auth::user();
     $viewData = [];
 
-    // Data for the student's project (from SDM-2)
     if ($user->role === 'student') {
         $viewData['project'] = Project::where('user_id', $user->id)->first();
     }
 
-    // Data for templates (for SDM-4)
+    // SDM-4: expose templates on dashboard
     $viewData['templates'] = DocumentTemplate::all();
 
     return view('dashboard', $viewData);
-
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 // --- General Authenticated Routes ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Profile Management
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Supervisor Directory (accessible to all authenticated users)
+    // Supervisor Directory
     Route::get('/supervisors', [SupervisorController::class, 'directory'])->name('supervisors.directory');
-    
-    // ** UNIFIED DOWNLOAD ROUTE **
-    // A single, consistent route for downloading any document, handled by the main ProjectController.
-    Route::get('/scope-documents/{scope_document}/download', [ProjectController::class, 'downloadScopeDocument'])->name('scope.document.download');
-});
 
+    // Scope documents download (existing)
+    Route::get('/scope-documents/{scope_document}/download', [ProjectController::class, 'downloadScopeDocument'])
+        ->name('scope.document.download');
+
+    // SDM-4: Document templates download for all authenticated users
+    Route::get('/templates/{template}/download', [DocumentTemplateController::class, 'download'])
+        ->name('templates.download');
+});
 
 // --- Student Specific Routes ---
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::get('/projects/{project}/scope/create', [ProjectController::class, 'createScopeDocument'])->name('projects.scope.create');
     Route::post('/projects/{project}/scope', [ProjectController::class, 'storeScopeDocument'])->name('projects.scope.store');
-    // Note: The student download route is now the unified one above.
 });
-
 
 // --- Supervisor Specific Routes ---
 Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
     Route::get('/supervisor/projects', [SupervisorController::class, 'index'])->name('supervisor.projects');
     Route::patch('/supervisor/projects/{project}/approve', [SupervisorController::class, 'approve'])->name('supervisor.projects.approve');
     Route::patch('/supervisor/projects/{project}/reject', [SupervisorController::class, 'reject'])->name('supervisor.projects.reject');
-
     Route::patch('/supervisor/projects/{project}/complete', [SupervisorController::class, 'complete'])->name('supervisor.projects.complete');
     Route::get('/supervisor/history', [SupervisorController::class, 'history'])->name('supervisor.history');
-
     Route::get('/supervisor/profile', [SupervisorController::class, 'editProfile'])->name('supervisor.profile.edit');
-    Route::patch('/supervisor/profile', [SupervisorController::class, 'updateProfile'])->name('supervisor.profile.update');
-    // Note: The supervisor download route is now the unified one above.
 });
 
+// --- Admin Routes ---
+Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
+    Route::get('users/toggle-status/{user}', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
-// --- Administrator Panel Routes ---
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // User Management Routes
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::patch('/users/{user}/status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
-    Route::get('/users/upload', [UserController::class, 'showUploadForm'])->name('users.upload.form');
-    Route::post('/users/upload', [UserController::class, 'processUpload'])->name('users.upload.process');
-    Route::get('/users/upload/template', [UserController::class, 'downloadTemplate'])->name('users.template.download');
-    
-    // ** CORRECTED ADMIN PROJECT ROUTE **
-    // This now correctly points to the AdminProjectController.
-    Route::get('/projects', [AdminProjectController::class, 'index'])->name('projects.index');
-    
-    // Admin Scope Document Version Management
-    Route::get('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'index'])->name('projects.scope-documents.index');
-    Route::get('/projects/{project}/scope-documents/create', [AdminScopeDocumentController::class, 'create'])->name('projects.scope-documents.create');
-    Route::post('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'store'])->name('projects.scope-documents.store');
-    
+    Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
 
-    Route::resource('/admin/templates', DocumentTemplateController::class)->except(['show', 'edit', 'update'])->names('admin.templates');
+    // SDM-4: Correct resource path (avoid double /admin)
+    Route::resource('templates', DocumentTemplateController::class)
+        ->except(['show', 'edit', 'update'])
+        ->names('templates');
 
-    // Note: The admin download route uses the unified one defined outside this group.
-    // The AdminScopeDocumentController's download link should point to `scope.document.download`.
+    // Scope Document versioning mgmt (existing)
+    Route::get('scope-documents', [AdminScopeDocumentController::class, 'index'])->name('scope-documents.index');
+    Route::get('scope-documents/create', [AdminScopeDocumentController::class, 'create'])->name('scope-documents.create');
+    Route::post('scope-documents', [AdminScopeDocumentController::class, 'store'])->name('scope-documents.store');
 });
 
 require __DIR__.'/auth.php';
