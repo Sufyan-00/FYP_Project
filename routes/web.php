@@ -42,6 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // SDM-4: Document templates download for all authenticated users
     Route::get('/templates/{template}/download', [DocumentTemplateController::class, 'download'])
         ->name('templates.download');
+
+    Route::get('/templates/{template}/view', [DocumentTemplateController::class, 'view'])
+        ->name('templates.view');
 });
 
 // --- Student Specific Routes ---
@@ -49,8 +52,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::get('/projects/{project}/scope/create', [ProjectController::class, 'createScopeDocument'])->name('projects.scope.create');
     Route::post('/projects/{project}/scope', [ProjectController::class, 'storeScopeDocument'])->name('projects.scope.store');
-    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])
-    ->name('student.dashboard');
+    Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
 });
 
 // --- Supervisor Specific Routes ---
@@ -62,8 +64,7 @@ Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
     Route::get('/supervisor/history', [SupervisorController::class, 'history'])->name('supervisor.history');
     Route::get('/supervisor/profile', [SupervisorController::class, 'editProfile'])->name('supervisor.profile.edit');
     Route::patch('/supervisor/profile', [SupervisorController::class, 'updateProfile'])->name('supervisor.profile.update');
-    Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])
-    ->name('supervisor.dashboard');
+    Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])->name('supervisor.dashboard');
 });
 
 // --- Admin Routes ---
@@ -77,10 +78,17 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
 
     Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
 
-    // SDM-4: Correct resource path (avoid double /admin)
-    Route::resource('templates', DocumentTemplateController::class)
-        ->except(['show', 'edit', 'update'])
-        ->names('templates');
+    // SDM-4: Authoritative Templates UI (explicit routes; no resource to avoid duplicates)
+    Route::get('/templates', [DocumentTemplateController::class, 'index'])->name('templates.index');
+    Route::post('/templates', [DocumentTemplateController::class, 'store'])->name('templates.store');
+    Route::delete('/templates/{template}', [DocumentTemplateController::class, 'destroy'])->name('templates.destroy');
+
+    // Recycle Bin (soft-deletes)
+    Route::get('/templates/trash', [DocumentTemplateController::class, 'trash'])->name('templates.trash');
+    Route::patch('/templates/{template}/restore', [DocumentTemplateController::class, 'restore'])->name('templates.restore');
+    Route::delete('/templates/{template}/force', [DocumentTemplateController::class, 'forceDelete'])->name('templates.force-delete');
+    Route::get('/templates/cleartrash', [DocumentTemplateController::class, 'clearTrash'])->name('templates.trash.clear');
+    Route::delete('/templates/cleartrash', [DocumentTemplateController::class, 'clearTrash'])->name('templates.trash.clear');
 
     // Scope Document versioning mgmt (existing)
     Route::get('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'index'])->name('projects.scope-documents.index');

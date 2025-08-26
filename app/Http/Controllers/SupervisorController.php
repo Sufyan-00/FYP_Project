@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+ use App\Http\Requests\Supervisor\RejectProjectRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 
@@ -23,7 +24,7 @@ class SupervisorController extends Controller
                             ->with('student')
                             ->get();
 
-        return view('supervisors.projects', ['projects' => $projects]);
+        return view('supervisor.projects', ['projects' => $projects]);
     }
 
 
@@ -90,7 +91,7 @@ class SupervisorController extends Controller
     /**
      * Reject a project submission.
      */
-     public function reject(Request $request, Project $project): RedirectResponse
+     public function reject(RejectProjectRequest $request, Project $project): RedirectResponse
     {
         $supervisor = Auth::user();
 
