@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController as MainDashboardController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Supervisor\DashboardController as SupervisorDashboardController;
+use App\Http\Controllers\Admin\CommitteeController;
+use App\Http\Controllers\Admin\DefenceSessionController;
+use App\Http\Controllers\Member\SessionEvaluationController;
+use App\Http\Controllers\Admin\EvaluatorController as AdminEvaluatorController;
 
 // --- Publicly Accessible Routes ---
 Route::get('/', function () {
@@ -78,7 +82,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
 
     Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
 
-    // SDM-4: Authoritative Templates UI (explicit routes; no resource to avoid duplicates)
+    // SDM-4: Authoritative Templates UI
     Route::get('/templates', [DocumentTemplateController::class, 'index'])->name('templates.index');
     Route::post('/templates', [DocumentTemplateController::class, 'store'])->name('templates.store');
     Route::delete('/templates/{template}', [DocumentTemplateController::class, 'destroy'])->name('templates.destroy');
@@ -94,6 +98,34 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'index'])->name('projects.scope-documents.index');
     Route::get('/projects/{project}/scope-documents/create', [AdminScopeDocumentController::class, 'create'])->name('projects.scope-documents.create');
     Route::post('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'store'])->name('projects.scope-documents.store');
+
+    // NEW: Evaluator Directory (admin-only)
+    Route::get('/evaluators', [AdminEvaluatorController::class, 'index'])->name('evaluators.index');
+    Route::get('/evaluators/create', [AdminEvaluatorController::class, 'create'])->name('evaluators.create');
+    Route::post('/evaluators', [AdminEvaluatorController::class, 'store'])->name('evaluators.store');
+
+    // Committees (ensure add/remove uses evaluator-only flow)
+    Route::resource('committees', \App\Http\Controllers\Admin\CommitteeController::class);
+    Route::post('committees/{committee}/members', [\App\Http\Controllers\Admin\CommitteeController::class, 'addMember'])
+        ->name('committees.members.add');
+    Route::delete('committees/{committee}/members/{user}', [\App\Http\Controllers\Admin\CommitteeController::class, 'removeMember'])
+        ->name('committees.members.remove');
+
+    // Defence Sessions
+    Route::resource('defence-sessions', \App\Http\Controllers\Admin\DefenceSessionController::class)->parameters([
+        'defence-sessions' => 'defenceSession'
+    ])->except(['edit', 'update']);
+    Route::post('defence-sessions/{defenceSession}/evaluators', [\App\Http\Controllers\Admin\DefenceSessionController::class, 'assignEvaluators'])
+        ->name('defence-sessions.assign-evaluators');
+    Route::patch('defence-sessions/{defenceSession}/status', [\App\Http\Controllers\Admin\DefenceSessionController::class, 'updateStatus'])
+        ->name('defence-sessions.update-status');
+});
+
+// Committee member routes
+Route::middleware(['auth', 'verified'])->prefix('member')->name('member.')->group(function () {
+    Route::get('sessions', [SessionEvaluationController::class, 'index'])->name('sessions.index');
+    Route::get('assignments/{assignment}/evaluate', [SessionEvaluationController::class, 'evaluate'])->name('sessions.evaluate');
+    Route::post('assignments/{assignment}/submit', [SessionEvaluationController::class, 'submit'])->name('sessions.submit');
 });
 
 require __DIR__.'/auth.php';

@@ -55,4 +55,8 @@
     <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
         Users
     </x-responsive-nav-link>
+
+    <x-responsive-nav-link :href="route('admin.evaluators.index')" :active="request()->routeIs('admin.evaluators.*')">
+        Evaluators
+    </x-responsive-nav-link>
 @endif
