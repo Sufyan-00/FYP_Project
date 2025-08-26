@@ -40,6 +40,13 @@ class SessionEvaluationController extends Controller
     {
         $this->authorizeView($assignment);
 
+        $session = $assignment->session()->firstOrFail();
+        if (now()->greaterThan($session->scheduled_at->copy()->addDay())) {
+            return back()->withErrors([
+                'scores.novelty' => 'Submission window has closed (24 hours after the session).',
+            ])->withInput();
+        }
+
         $validated = $request->validate([
             'scores.novelty' => ['required', 'integer', 'min:0', 'max:10'],
             'scores.methodology' => ['required', 'integer', 'min:0', 'max:10'],

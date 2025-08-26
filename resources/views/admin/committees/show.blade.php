@@ -64,6 +64,11 @@
                                 <button class="text-red-600 hover:text-red-800 text-sm">Remove</button>
                             </form>
                         </div>
+                    @if ($committee->members->count() < 2)
+                        <div class="mb-4 p-3 rounded bg-yellow-50 text-yellow-800 text-sm">
+                            This committee has fewer than 2 members. You cannot schedule a defence with this committee until you add more members.
+                        </div>
+                    @endif
                     @empty
                         <p class="text-gray-500 mt-2">No members yet.</p>
                     @endforelse
@@ -76,24 +81,51 @@
                     <h3 class="font-medium text-gray-900">Schedule Defence Session</h3>
                     <a class="text-sm text-indigo-600" href="{{ route('admin.defence-sessions.index') }}">All Sessions</a>
                 </div>
+
+                {{-- Flash + errors --}}
+                @if (session('success'))
+                    <div class="mt-3 rounded bg-green-50 px-3 py-2 text-green-800 text-sm">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if ($errors->any())
+                    <div class="mt-3 rounded bg-red-50 px-3 py-2 text-red-800 text-sm">
+                        <div class="font-medium">Please correct the errors below:</div>
+                        <ul class="mt-1 list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form class="mt-4 grid gap-4 sm:grid-cols-2" method="POST" action="{{ route('admin.defence-sessions.store') }}">
                     @csrf
                     <input type="hidden" name="committee_id" value="{{ $committee->id }}">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Project</label>
                         <select name="project_id" class="mt-1 w-full border-gray-300 rounded" required>
-                            @foreach (App\Models\Project::orderBy('created_at','desc')->get(['id','title']) as $p)
-                                <option value="{{ $p->id }}">{{ $p->title }}</option>
+                            @foreach ($approvedProjects as $p)
+                                <option value="{{ $p->id }}" @selected(old('project_id') == $p->id)>{{ $p->title }}</option>
                             @endforeach
                         </select>
+                        @error('project_id')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Scheduled At</label>
-                        <input type="datetime-local" name="scheduled_at" class="mt-1 w-full border-gray-300 rounded" required>
+                        <input type="datetime-local" name="scheduled_at" value="{{ old('scheduled_at') }}" class="mt-1 w-full border-gray-300 rounded" required>
+                        @error('scheduled_at')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium text-gray-700">Venue</label>
-                        <input type="text" name="venue" class="mt-1 w-full border-gray-300 rounded" placeholder="e.g., Seminar Hall A">
+                        <input type="text" name="venue" value="{{ old('venue') }}" class="mt-1 w-full border-gray-300 rounded" placeholder="e.g., Seminar Hall A">
+                        @error('venue')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="sm:col-span-2">
                         <button class="px-4 py-2 bg-indigo-600 text-white rounded">Schedule</button>

@@ -10,6 +10,12 @@
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow sm:rounded-lg">
                 <div class="p-6">
+                    @if (session('success'))
+                        <div class="mb-4 rounded bg-green-50 px-3 py-2 text-green-800 text-sm">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
                     @if ($sessions->isEmpty())
                         <p class="text-gray-500">No sessions yet.</p>
                     @else
@@ -32,12 +38,8 @@
                                             <td class="py-2 pr-4">{{ $s->committee->name }}</td>
                                             <td class="py-2 pr-4">{{ $s->scheduled_at->format('Y-m-d H:i') }}</td>
                                             <td class="py-2 pr-4">{{ $s->venue ?: '—' }}</td>
-                                            <td class="py-2 pr-4">
-                                                <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100">{{ ucfirst($s->status) }}</span>
-                                            </td>
-                                            <td class="py-2">
-                                                <a class="text-indigo-600 hover:underline" href="{{ route('admin.defence-sessions.show', $s) }}">Open</a>
-                                            </td>
+                                            <td class="py-2 pr-4"><span class="px-2 py-0.5 rounded-full text-xs bg-gray-100">{{ ucfirst($s->status) }}</span></td>
+                                            <td class="py-2"><a class="text-indigo-600 hover:underline" href="{{ route('admin.defence-sessions.show', $s) }}">Open</a></td>
                                         </tr>
                                     @endforeach
                                 </tbody>

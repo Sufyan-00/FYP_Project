@@ -2,7 +2,8 @@
 
 @php
     $role = auth()->user()?->role;
-
+    $user = auth()->user();
+    $isEvaluator = $user?->isEvaluator() ?? false;
     // Map to per-role dashboards; fallback to default 'dashboard'
     $dashboardRoutes = [
         'student' => 'student.dashboard',
@@ -42,6 +43,13 @@
         <x-nav-link :href="route('supervisor.profile.edit')" :active="request()->routeIs('supervisor.profile.edit')">
             My Profile
         </x-nav-link>
+
+        @if ($isEvaluator)
+        <x-nav-link :href="route('member.sessions.index')" :active="request()->routeIs('member.sessions.index')">
+            My Sessions (as evaluator)
+        </x-nav-link>
+        @endif
+
 
     @elseif ($role === 'admin')
         <x-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">

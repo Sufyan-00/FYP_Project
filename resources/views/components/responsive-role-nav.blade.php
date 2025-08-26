@@ -1,6 +1,7 @@
 @php
     $role = auth()->user()?->role;
-
+    $user = auth()->user();
+    $isEvaluator = $user?->isEvaluator() ?? false;
     $dashboardRoutes = [
         'student' => 'student.dashboard',
         'supervisor' => 'supervisor.dashboard',
@@ -38,6 +39,13 @@
     <x-responsive-nav-link :href="route('supervisor.profile.edit')" :active="request()->routeIs('supervisor.profile.edit')">
         My Profile
     </x-responsive-nav-link>
+
+    @if ($isEvaluator)
+    <x-responsive-nav-link :href="route('member.sessions.index')" :active="request()->routeIs('member.sessions.index')">
+        My Sessions (as evaluator)
+    </x-responsive-nav-link>
+    @endif
+        
 
 @elseif ($role === 'admin')
     <x-responsive-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">

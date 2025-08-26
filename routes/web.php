@@ -69,7 +69,15 @@ Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
     Route::get('/supervisor/profile', [SupervisorController::class, 'editProfile'])->name('supervisor.profile.edit');
     Route::patch('/supervisor/profile', [SupervisorController::class, 'updateProfile'])->name('supervisor.profile.update');
     Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])->name('supervisor.dashboard');
+    
 });
+
+// Committee member routes
+    Route::middleware(['auth', 'evaluator'])->prefix('member')->name('member.')->group(function ()  {
+        Route::get('sessions', [SessionEvaluationController::class, 'index'])->name('sessions.index');
+        Route::get('assignments/{assignment}/evaluate', [SessionEvaluationController::class, 'evaluate'])->name('sessions.evaluate');
+        Route::post('assignments/{assignment}/submit', [SessionEvaluationController::class, 'submit'])->name('sessions.submit');
+    });
 
 // --- Admin Routes ---
 Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.')->group(function () {
@@ -121,11 +129,5 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
         ->name('defence-sessions.update-status');
 });
 
-// Committee member routes
-Route::middleware(['auth', 'verified'])->prefix('member')->name('member.')->group(function () {
-    Route::get('sessions', [SessionEvaluationController::class, 'index'])->name('sessions.index');
-    Route::get('assignments/{assignment}/evaluate', [SessionEvaluationController::class, 'evaluate'])->name('sessions.evaluate');
-    Route::post('assignments/{assignment}/submit', [SessionEvaluationController::class, 'submit'])->name('sessions.submit');
-});
 
 require __DIR__.'/auth.php';

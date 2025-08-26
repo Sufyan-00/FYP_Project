@@ -47,4 +47,14 @@ class Project extends Model
     {
         return $this->hasOne(ScopeDocument::class)->latestOfMany();
     }
+
+    public function defenceSessions(): HasMany
+    {
+        return $this->hasMany(DefenceSession::class, 'project_id');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
 }

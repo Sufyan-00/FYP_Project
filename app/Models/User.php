@@ -26,6 +26,10 @@ class User extends Authenticatable
     public function isAdmin(): bool { return $this->role === 'admin'; }
     public function isSupervisor(): bool { return $this->role === 'supervisor'; }
     public function isStudent(): bool { return $this->role === 'student'; }
+    public function isEvaluator(): bool
+    {
+        return method_exists($this, 'evaluator') && $this->evaluator()->exists();
+    }
 
     public function projects(): HasMany
     {

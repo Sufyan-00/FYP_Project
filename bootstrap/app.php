@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'supervisor' => \App\Http\Middleware\SupervisorMiddleware::class,
+            'evaluator' => \App\Http\Middleware\EnsureUserIsEvaluator::class,
         ]);
         
     })
