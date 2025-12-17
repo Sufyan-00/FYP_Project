@@ -474,7 +474,6 @@ CI-4: The system shall implement appropriate security measures for all communica
 
 CI-5: The system shall handle network interruptions gracefully, allowing users to resume activities when the connection is restored.
 
-# **Project Gantt Chart**
 
 
 # **References**
