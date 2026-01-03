@@ -25,4 +25,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('templates:purge --days=30')->dailyAt('02:15');
+        
+        // Add defence session status update
+        $schedule->command('defence:update-status')
+                 ->daily()
+                 ->at('00:01')
+                 ->withoutOverlapping()
+                 ->appendOutputTo(storage_path('logs/defence-status-updates.log'));
     })->create();

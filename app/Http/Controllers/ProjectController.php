@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 
-
 class ProjectController extends Controller
 {
     /**
@@ -140,11 +139,29 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Project $project)
     {
-        //
-    }
+        // Fix: Use user_id instead of student_id (consistent with your other methods)
+        if ($project->user_id !== auth()->id()) {
+            return back()->withErrors(['error' => 'You can only delete your own projects.']);
+        }
 
+        // Check if project has a scope document uploaded
+        if ($project->latestScopeDocument) {
+            return back()->withErrors(['error' => 'Cannot delete project with uploaded scope document.']);
+        }
+
+        // Check if project has defence sessions
+        if ($project->defenceSessions()->exists()) {
+            return back()->withErrors(['error' => 'Cannot delete project with scheduled defence sessions.']);
+        }
+
+        $projectTitle = $project->title;
+        $project->delete();
+
+        return redirect()->route('projects.index')
+            ->with('success', "Project \"{$projectTitle}\" deleted successfully.");
+    }
     // ... (create, store, edit, update methods remain the same as your last version) ...
     // To save space, I'm omitting the methods that are already correct.
     // The key changes are in the `storeScopeDocument` and `downloadScopeDocument` methods below.
@@ -201,5 +218,46 @@ class ProjectController extends Controller
 
         return Storage::download($scope_document->file_path);
     }
+
+    public function destroyScopeDocument(Project $project, ScopeDocument $scope_document)
+    {
+        // Check if project belongs to current student
+        if ($project->user_id !== auth()->id()) {
+            return back()->withErrors(['error' => 'You can only delete scope documents from your own projects.']);
+        }
+
+        // Check if scope document belongs to this project
+        if ($scope_document->project_id !== $project->id) {
+            return back()->withErrors(['error' => 'Scope document does not belong to this project. ']);
+        }
+
+        // Check if scope document was uploaded by current student
+        if ($scope_document->user_id !== auth()->id()) {
+            $uploader_name = $scope_document->user->name ?? 'Admin';
+            return back()->withErrors(['error' => "Cannot delete scope document uploaded by {$uploader_name}."]);
+        }
+
+        // Check if project has defence sessions scheduled
+        if ($project->defenceSessions()->exists()) {
+            return back()->withErrors(['error' => 'Cannot delete scope document when defence sessions are scheduled.']);
+        }
+
+        try {
+            // Delete the file from storage
+            if (Storage::exists($scope_document->file_path)) {
+                Storage::delete($scope_document->file_path);
+            }
+
+            // Delete the database record
+            $scope_document->delete();
+
+            return redirect()->route('projects.index')
+                ->with('success', 'Scope document deleted successfully.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to delete scope document. Please try again.']);
+        }
+    }
+
 
 }

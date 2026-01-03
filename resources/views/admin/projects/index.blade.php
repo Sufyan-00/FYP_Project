@@ -19,9 +19,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Supervisor</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Scope Document</th> {{-- New Column --}}
-                                    <th scope="col" class="relative px-6 py-3">
-                                        <span class="sr-only">Actions</span>
-                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th> {{-- New Column --}}
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -48,10 +46,39 @@
                                                 Manage Versions
                                             </a>
                                         </td>
-
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {{-- Your existing view/edit/delete actions can go here --}}
-                                            <a href="#" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">View</a>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            <a href="{{ route('admin.projects.show', $project) }}" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-medium">
+                                               View
+                                            </a>
+                                            /
+                                            {{-- Enhanced delete validation --}}
+                                            @php
+                                                $hasDefenceSessions = \App\Models\DefenceSession:: where('project_id', $project->id)->exists();
+                                                $hasScopeDocuments = $project->scopeDocuments()->exists();
+                                                $canDelete = !$hasDefenceSessions;
+                                                
+                                                $deleteTooltip = '';
+                                                if ($hasDefenceSessions) {
+                                                    $deleteTooltip = 'Cannot delete - has defence sessions';
+                                                } elseif ($project->status === 'completed') {
+                                                    $deleteTooltip = 'Cannot delete - project completed';
+                                                }
+                                            @endphp
+                                            
+                                            @if($canDelete && $project->status !== 'completed')
+                                                <form action="{{ route('admin.projects.destroy', $project) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200"
+                                                            onclick="return confirm('⚠️ DELETE PROJECT CONFIRMATION ⚠️\n\nProject: {{ $project->title }}\nStudent: {{ $project->student->name }}\nStatus: {{ ucfirst($project->status) }}\n{{ $hasScopeDocuments ? "⚠️ This project has scope documents that will also be deleted." : "" }}\n\nThis action is PERMANENT and cannot be undone.\n\nContinue with deletion?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="text-gray-400 cursor-not-allowed" title="{{ $deleteTooltip }}">
+                                                    Delete
+                                                </span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

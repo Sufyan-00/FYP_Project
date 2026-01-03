@@ -125,7 +125,7 @@ class SupervisorController extends Controller
             ['available_slots' => 8] // Default value if creating
         );
 
-        return view('supervisors.profile', [
+        return view('supervisor.profile', [
             'user' => $supervisor,
             'profile' => $profile
         ]);
@@ -141,7 +141,6 @@ class SupervisorController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'research_interests' => 'nullable|string',
-            'available_slots' => 'required|integer|min:0',
         ]);
 
         // Update the user's name
@@ -150,7 +149,6 @@ class SupervisorController extends Controller
         // Update the supervisor's profile
         $supervisor->supervisorProfile()->update([
             'research_interests' => $validated['research_interests'],
-            'available_slots' => $validated['available_slots'],
         ]);
 
         return redirect()->route('supervisor.profile.edit')->with('success', 'Profile updated successfully!');

@@ -68,12 +68,21 @@
             Users
         </x-nav-link>
 
+        <x-nav-link :href="route('admin.evaluators.index')" :active="request()->routeIs('admin.evaluators.*')">
+            Evaluators
+        </x-nav-link>
+
         <x-nav-link :href="route('admin.committees.index')" :active="request()->routeIs('admin.committees.*')">
             Committees
         </x-nav-link>
 
-        <x-nav-link :href="route('admin.evaluators.index')" :active="request()->routeIs('admin.evaluators.*')">
-            Evaluators
+        <x-nav-link :href="route('admin.defence-sessions.index')" :active="request()->routeIs('admin.defence-sessions.*')">
+            Defence Sessions
         </x-nav-link>
+
+        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+            Reports
+        </x-nav-link>
+
     @endif
 </div>

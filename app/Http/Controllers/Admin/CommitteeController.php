@@ -72,10 +72,61 @@ class CommitteeController extends Controller
         return redirect()->route('admin.committees.show', $committee)->with('success', 'Committee updated.');
     }
 
+    // public function destroy(Committee $committee)
+    // {
+    //     $committee->delete();
+    //     return redirect()->route('admin.committees.index')->with('success', 'Committee deleted.');
+    // }
+
     public function destroy(Committee $committee)
     {
-        $committee->delete();
-        return redirect()->route('admin.committees.index')->with('success', 'Committee deleted.');
+        try {
+            DB::beginTransaction();
+
+            // Check if committee has defence sessions
+            $sessionCount = $committee->sessions()->count();
+            
+            if ($sessionCount > 0) {
+                DB::rollBack();
+                return back()->withErrors([
+                    'error' => "Cannot delete committee with {$sessionCount} defence session(s). Please reassign or delete sessions first."
+                ]);
+            }
+
+            // Get committee member IDs before deletion
+            $memberIds = $committee->members->pluck('id')->toArray();
+
+            // Remove committee members (pivot table)
+            $committee->members()->detach();
+
+            // Update evaluator status for members who are no longer assigned
+            foreach ($memberIds as $userId) {
+                $hasOtherAssignments = \App\Models\SessionAssignment::where('user_id', $userId)
+                    ->whereHas('session', function($q) {
+                        $q->where('status', 'scheduled');
+                    })
+                    ->exists();
+
+                // If no other active assignments, set status to available
+                if (!$hasOtherAssignments) {
+                    \App\Models\Evaluator::where('user_id', $userId)
+                        ->update(['status' => 'available']);
+                }
+            }
+            
+            // Delete the committee
+            $committee->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.committees.index')
+                ->with('success', 'Committee deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.committees.index')
+                ->withErrors(['error' => 'Failed to delete committee.  Please try again.']);
+        }
     }
 
     // Only evaluator (supervisor) can be added

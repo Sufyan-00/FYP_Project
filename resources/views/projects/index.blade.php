@@ -18,6 +18,12 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <ul role="list" class="divide-y divide-gray-200">
@@ -28,7 +34,7 @@
                                         <div class="flex items-center justify-between">
                                             <h3 class="text-lg font-medium">{{ $project->title }}</h3>
                                             <p class="text-sm text-gray-500">
-                                                Supervisor: {{ $project->supervisor->name ?? 'Not Assigned' }}
+                                                Supervisor: {{ $project->supervisor->name ??  'Not Assigned' }}
                                             </p>
                                         </div>
                                         <p class="mt-1 text-sm text-gray-600">
@@ -45,26 +51,73 @@
                                             <div>
                                                 <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium {{ 
                                                     $project->status == 'approved' ? 'bg-green-100 text-green-800' : 
-                                                    ($project->status == 'rejected' ? 'bg-red-100 text-red-800' : 
+                                                    ($project->status == 'rejected' ? 'bg-red-100 text-red-800' :   
                                                     'bg-yellow-100 text-yellow-800') 
                                                 }}">
                                                     {{ ucfirst($project->status) }}
                                                 </span>
                                             </div>
-                                            <div class="text-sm font-medium">
+                                            <div class="flex items-center gap-3 text-sm font-medium">
                                                 @if ($project->status == 'approved')
                                                     @if ($project->latestScopeDocument)
-                                                        {{-- This now points to the unified download route --}}
-                                                        <a href="{{ route('scope.document.download', $project->latestScopeDocument) }}" class="text-green-600 hover:text-green-900">View Document</a>
+                                                        {{-- View Document --}}
+                                                        <a href="{{ route('scope.document.download', $project->latestScopeDocument) }}" 
+                                                        class="text-green-600 hover:text-green-900">View Document</a>
+                                                        
+                                                        {{-- Check if the scope was uploaded by current student --}}
+                                                        @if ($project->latestScopeDocument->user_id === auth()->id())
+                                                            {{-- Student uploaded - can delete --}}
+                                                            <form action="{{ route('projects.scope.destroy', [$project, $project->latestScopeDocument]) }}" 
+                                                                method="POST" class="inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" 
+                                                                        class="text-red-600 hover:text-red-900"
+                                                                        onclick="return confirm('Are you sure you want to delete this scope document?  This action cannot be undone.')">
+                                                                    Delete Document
+                                                                </button>
+                                                            </form>
+                                                        @else
+                                                            {{-- Admin uploaded - cannot delete --}}
+                                                            <span class="text-gray-500 text-xs">
+                                                                Cannot delete - uploaded by {{ $project->latestScopeDocument->user->name ??  'Admin' }}
+                                                            </span>
+                                                        @endif
                                                     @else
-                                                        <a href="{{ route('projects.scope.create', $project) }}" class="text-indigo-600 hover:text-indigo-900">Upload Scope</a>
+                                                        {{-- No scope document uploaded yet --}}
+                                                        <a href="{{ route('projects.scope.create', $project) }}" 
+                                                        class="text-indigo-600 hover:text-indigo-900">Upload Scope</a>
+                                                        
+                                                        {{-- NO DELETE BUTTON for approved projects, even without scope --}}
+                                                        <span class="text-gray-500 text-xs">Project approved - cannot be deleted</span>
                                                     @endif
                                                 @elseif ($project->status == 'rejected')
                                                     <a href="{{ route('projects.edit', $project) }}" class="text-blue-600 hover:text-blue-900">Edit & Resubmit</a>
+                                                    
+                                                    {{-- Delete button for rejected projects --}}
+                                                    <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" 
+                                                                class="text-red-600 hover:text-red-900"
+                                                                onclick="return confirm('Are you sure you want to delete this project?  This action cannot be undone.')">
+                                                            Delete Project
+                                                        </button>
+                                                    </form>
                                                 @elseif ($project->status == 'completed')
-                                                    <span class="text-gray-500 cursor-not-allowed">Project has been marked completed.</span>
+                                                    <span class="text-gray-500">Project Completed</span>
                                                 @else
-                                                    <span class="text-gray-500 cursor-not-allowed">Awaiting Approval</span>
+                                                    {{-- Pending projects can be deleted --}}
+                                                    <span class="text-gray-500 mr-3">Awaiting Approval</span>
+                                                    <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" 
+                                                                class="text-red-600 hover:text-red-900"
+                                                                onclick="return confirm('Are you sure you want to delete this project? This action cannot be undone.')">
+                                                            Delete Project
+                                                        </button>
+                                                    </form>
                                                 @endif
                                             </div>
                                         </div>

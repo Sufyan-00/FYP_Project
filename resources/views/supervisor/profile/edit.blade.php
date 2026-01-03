@@ -28,13 +28,6 @@
                             <x-input-error :messages="$errors->get('research_interests')" class="mt-2" />
                         </div>
 
-                        <!-- Available Slots -->
-                        <div class="mt-4">
-                            <x-input-label for="available_slots" :value="__('Available Project Slots')" />
-                            <x-text-input id="available_slots" class="block mt-1 w-full" type="number" name="available_slots" :value="old('available_slots', $profile->available_slots)" required />
-                            <x-input-error :messages="$errors->get('available_slots')" class="mt-2" />
-                        </div>
-
                         <div class="flex items-center justify-end mt-4">
                             <x-primary-button>
                                 {{ __('Save Profile') }}

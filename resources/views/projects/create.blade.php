@@ -49,9 +49,6 @@
 
                         <!-- Action Buttons -->
                         <div class="flex items-center justify-end gap-4">
-                            <button type="button" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                Save as Draft
-                            </button>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Submit for Approval
                             </button>

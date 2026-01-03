@@ -48,23 +48,31 @@
         
 
 @elseif ($role === 'admin')
-    <x-responsive-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">
+    <x-nav-link :href="route($dashboardRoute)" :active="request()->routeIs($dashboardRoute)">
         Dashboard
-    </x-responsive-nav-link>
+    </x-nav-link>
 
-    <x-responsive-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
+    <x-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
         Projects
-    </x-responsive-nav-link>
+    </x-nav-link>
 
-    <x-responsive-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">
+    <x-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">
         Templates
-    </x-responsive-nav-link>
+    </x-nav-link>
 
-    <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
         Users
-    </x-responsive-nav-link>
+    </x-nav-link>
 
-    <x-responsive-nav-link :href="route('admin.evaluators.index')" :active="request()->routeIs('admin.evaluators.*')">
+    <x-nav-link :href="route('admin.evaluators.index')" :active="request()->routeIs('admin.evaluators.*')">
         Evaluators
-    </x-responsive-nav-link>
+    </x-nav-link>
+
+    <x-nav-link :href="route('admin.committees.index')" :active="request()->routeIs('admin.committees.*')">
+        Committees
+    </x-nav-link>
+
+    <x-nav-link :href="route('admin.defence-sessions.index')" :active="request()->routeIs('admin.defence-sessions.*')">
+        Defence Sessions
+    </x-nav-link>
 @endif

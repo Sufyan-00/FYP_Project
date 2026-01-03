@@ -1,50 +1,104 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Administrative Reports</h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Reports') }}
+            </h2>
+            <a href="{{ route('admin.reports.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Generate New Report
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Administrative Reports -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Generate Reports</h3>
-                        <p class="text-sm text-gray-500 mt-1">Export key system data for administrative review (Requirement NRS-3).</p>
-                        <div class="mt-4 space-y-3">
-                            <div class="flex justify-between items-center p-3 border rounded-md">
-                                <span>All Approved Projects List</span>
-                                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">Export as PDF</a>
-                            </div>
-                            <div class="flex justify-between items-center p-3 border rounded-md">
-                                <span>Supervisor Workload Report</span>
-                                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">Export as Excel</a>
-                            </div>
-                            <div class="flex justify-between items-center p-3 border rounded-md">
-                                <span>Projects Pending Approval</span>
-                                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">Export as PDF</a>
-                            </div>
-                        </div>
-                    </div>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg: px-8">
+            <!-- Status Messages -->
+            @if (session('success'))
+                <div class="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg" role="alert">
+                    {{ session('success') }}
                 </div>
+            @endif
+            @if ($errors->any())
+                <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                    {{ $errors->first() }}
+                </div>
+            @endif
 
-                <!-- Document Template Management (link-only; authoritative screen is admin/templates) -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900">Manage Document Templates</h3>
-                                <p class="text-sm text-gray-500 mt-1">Go to the templates management area (Requirement SDM-4).</p>
-                            </div>
-                            <a href="{{ route('admin.templates.index') }}"
-                               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                Open Templates
+            <div class="bg-white dark: bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
+                    @if($reports->isEmpty())
+                        <div class="text-center py-8">
+                            <p class="text-gray-500">No reports generated yet.</p>
+                            <a href="{{ route('admin.reports.create') }}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover: bg-blue-600">
+                                Generate Your First Report
                             </a>
                         </div>
-                        <p class="text-sm text-gray-500 mt-4">
-                            This page no longer duplicates template upload/list UI. Use the Templates screen to upload, download, and delete templates.
-                        </p>
-                    </div>
+                    @else
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Format</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Generated By</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Generated At</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @foreach($reports as $report)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $report->title }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="text-sm text-gray-500 dark:text-gray-300">{{ str_replace('_', ' ', ucwords($report->type, '_')) }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ strtoupper($report->format) }}</span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 py-1 text-xs rounded-full {{ $report->status_badge_class }}">
+                                                    {{ ucfirst($report->status) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                {{ $report->generatedBy?->name ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                                {{ $report->generated_at ?  $report->generated_at->format('M j, Y H:i') : '—' }}
+                                                @if($report->file_size)
+                                                    <br><small class="text-xs text-gray-400">{{ $report->file_size }}</small>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                @if($report->status === 'completed')
+                                                    <a href="{{ route('admin.reports.download', $report) }}" class="text-green-600 hover:text-green-900 mr-3">
+                                                        Download
+                                                    </a>
+                                                @endif
+                                                <form action="{{ route('admin.reports.destroy', $report) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900"
+                                                            onclick="return confirm('Delete this report?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4">
+                            {{ $reports->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

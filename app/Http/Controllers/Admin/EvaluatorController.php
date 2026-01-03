@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Evaluator;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\SessionAssignment;
 
 class EvaluatorController extends Controller
 {
@@ -52,5 +53,30 @@ class EvaluatorController extends Controller
         ]);
 
         return redirect()->route('admin.evaluators.index')->with('success', 'Evaluator added successfully.');
+    }
+
+    public function destroy(Evaluator $evaluator)
+    {
+        // Check if evaluator status is 'assigned'
+        if ($evaluator->status === 'assigned') {
+            return back()->withErrors([
+                'error' => "Cannot remove {$evaluator->user->name} as they are currently assigned to evaluations."
+            ]);
+        }
+
+        // Additional check for any session assignments (double safety)
+        $hasAssignments = SessionAssignment::where('user_id', $evaluator->user_id)->exists();
+        
+        if ($hasAssignments) {
+            return back()->withErrors([
+                'error' => "Cannot remove {$evaluator->user->name} as they have evaluation assignments."
+            ]);
+        }
+
+        $evaluatorName = $evaluator->user->name;
+        $evaluator->delete();
+
+        return redirect()->route('admin.evaluators.index')
+            ->with('success', "Successfully removed {$evaluatorName} from evaluator directory.");
     }
 }

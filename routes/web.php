@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectController as StudentProjectController;
 use App\Http\Controllers\SupervisorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Http\Controllers\Admin\ScopeDocumentController as AdminScopeDocumentController;
 use App\Http\Controllers\Admin\DocumentTemplateController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Models\DocumentTemplate;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
@@ -45,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/supervisors', [SupervisorController::class, 'directory'])->name('supervisors.directory');
 
     // Scope documents download (existing)
-    Route::get('/scope-documents/{scope_document}/download', [ProjectController::class, 'downloadScopeDocument'])
+    Route::get('/scope-documents/{scope_document}/download', [StudentProjectController::class, 'downloadScopeDocument'])
         ->name('scope.document.download');
 
     // SDM-4: Document templates download for all authenticated users
@@ -58,10 +59,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // --- Student Specific Routes ---
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
-    Route::resource('projects', ProjectController::class);
-    Route::get('/projects/{project}/scope/create', [ProjectController::class, 'createScopeDocument'])->name('projects.scope.create');
-    Route::post('/projects/{project}/scope', [ProjectController::class, 'storeScopeDocument'])->name('projects.scope.store');
+    Route::resource('projects', StudentProjectController::class);
+    Route::get('/projects/{project}/scope/create', [StudentProjectController::class, 'createScopeDocument'])->name('projects.scope.create');
+    Route::post('/projects/{project}/scope', [StudentProjectController::class, 'storeScopeDocument'])->name('projects.scope.store');
     Route::get('/student/dashboard', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+    Route::delete('/projects/{project}', [StudentProjectController::class, 'destroy'])->name('projects.destroy');
+     // Add scope document delete route
+    Route::delete('/projects/{project}/scope/{scope_document}', [StudentProjectController::class, 'destroyScopeDocument'])->name('projects.scope.destroy');
 });
 
 // --- Supervisor Specific Routes ---
@@ -92,8 +96,14 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/users/upload', [AdminUserController::class, 'showUploadForm'])->name('users.upload.form');
     Route::post('/users/upload', [AdminUserController::class, 'processUpload'])->name('users.upload.process');
     Route::get('/users/upload/template', [AdminUserController::class, 'downloadTemplate'])->name('users.template.download');
-
     Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
+    // Enhanced user management routes
+    Route::patch('/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
+    Route::patch('/users/{user}/update-slots', [AdminUserController:: class, 'updateSlots'])->name('users.update-slots');
+    
+    // Reports
+    Route::resource('reports', ReportController::class)->except(['show', 'edit', 'update']);
+    Route::get('reports/{report}/download', [ReportController::class, 'download'])->name('reports.download');
 
     // SDM-4: Authoritative Templates UI
     Route::get('/templates', [DocumentTemplateController::class, 'index'])->name('templates.index');
@@ -111,11 +121,14 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'index'])->name('projects.scope-documents.index');
     Route::get('/projects/{project}/scope-documents/create', [AdminScopeDocumentController::class, 'create'])->name('projects.scope-documents.create');
     Route::post('/projects/{project}/scope-documents', [AdminScopeDocumentController::class, 'store'])->name('projects.scope-documents.store');
+    Route::resource('projects', AdminProjectController::class);
+    Route::patch('/projects/{project}/status', [AdminProjectController::class, 'updateStatus'])->name('projects.update-status');
 
     // NEW: Evaluator Directory (admin-only)
     Route::get('/evaluators', [AdminEvaluatorController::class, 'index'])->name('evaluators.index');
     Route::get('/evaluators/create', [AdminEvaluatorController::class, 'create'])->name('evaluators.create');
     Route::post('/evaluators', [AdminEvaluatorController::class, 'store'])->name('evaluators.store');
+    Route::delete('/evaluators/{evaluator}', [AdminEvaluatorController::class, 'destroy'])->name('evaluators.destroy');
 
     // Committees (ensure add/remove uses evaluator-only flow)
     Route::resource('committees', \App\Http\Controllers\Admin\CommitteeController::class);
