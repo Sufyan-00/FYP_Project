@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupervisorController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
@@ -21,8 +22,12 @@ use App\Http\Controllers\Member\SessionEvaluationController;
 use App\Http\Controllers\Admin\EvaluatorController as AdminEvaluatorController;
 
 // --- Publicly Accessible Routes ---
-Route::get('/', function () {
-    return view('welcome');
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::middleware('guest')->group(function () {
+    Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/', [AuthenticatedSessionController::class, 'store']);
 });
 
 Route::get('/dashboard', [MainDashboardController::class, 'index'])

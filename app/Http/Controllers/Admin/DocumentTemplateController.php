@@ -23,11 +23,6 @@ class DocumentTemplateController extends Controller
         return view('admin.templates.index', compact('templates'));
     }
 
-    public function create()
-    {
-        return view('admin.templates.create');
-    }
-
     public function store(TemplateStoreRequest $request)
     {
         // Validation is handled by the Form Request.

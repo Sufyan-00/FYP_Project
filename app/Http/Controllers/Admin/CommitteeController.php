@@ -34,23 +34,6 @@ class CommitteeController extends Controller
 
         $committee = Committee::create($data + ['created_by_id' => $request->user()->id]);
 
-        $scheduledAt = Carbon::parse($data['scheduled_at']);
-        $offenders = [];
-
-        $memberIds = $committee->members()->pluck('users.id')->all();
-        foreach ($memberIds as $uid) {
-            if (ConsecutiveSessions::wouldExceedLimit($uid, $scheduledAt)) {
-                $offenders[] = $uid;
-            }
-        }
-
-        if (!empty($offenders)) {
-            // Optionally resolve names for a friendly message
-            $names = \App\Models\User::whereIn('id', $offenders)->pluck('name')->implode(', ');
-            return back()->withErrors([
-                'committee_id' => "Consecutive sessions limit exceeded for: {$names}. Adjust time or members."
-            ])->withInput();
-        }
 
         return redirect()->route('admin.committees.show', $committee)->with('success', 'Committee created.');
     }
