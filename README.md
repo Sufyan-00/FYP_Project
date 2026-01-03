@@ -1,89 +1,81 @@
 # FYP Proposal Approval System (CUI Vehari)
 
-[cite_start]A comprehensive web-based platform designed to digitize and automate the Final Year Project (FYP) management process at COMSATS University Islamabad, Vehari Campus[cite: 8, 29]. [cite_start]This system replaces traditional paper-based workflows with a streamlined, transparent, and efficient digital environment[cite: 32, 115].
+A comprehensive web-based platform designed to digitize and automate the Final Year Project (FYP) management process at COMSATS University Islamabad, Vehari Campus. This system replaces traditional paper-based workflows with a streamlined, transparent, and efficient digital environment.
 
 ---
 
 ## 🚀 Project Overview
 
-[cite_start]The current manual process for managing student projects often suffers from slow approval workflows, lack of transparency, and inefficient communication[cite: 30]. [cite_start]This project solves these challenges by providing a centralized platform for the entire FYP lifecycle—from initial idea submission to final defense evaluation[cite: 32].
+The traditional manual process for managing student projects often suffers from slow approval workflows, lack of transparency, and inefficient communication. This project solves these challenges by providing a centralized platform for the entire FYP lifecycle—from initial idea submission to final defense evaluation.
 
-### Key Benefits:
-* [cite_start]**Efficiency:** Reduces processing time for project approvals by approximately 60-70%[cite: 42].
-* [cite_start]**Transparency:** Provides real-time status tracking for students and faculty[cite: 34, 43].
-* [cite_start]**Automation:** Intelligent scheduling and capacity enforcement reduce administrative burden[cite: 38, 406].
+### Key Success Metrics:
+* **Efficiency:** Reduces processing time for project approvals by 60-70%.
+* **Transparency:** Real-time status tracking for all stakeholders.
+* **Accuracy:** Intelligent scheduling and capacity enforcement to eliminate human error.
 
 ---
 
 ## 🛠 Tech Stack
 
-* [cite_start]**Framework:** Laravel 12 [cite: 37, 137]
-* [cite_start]**Language:** PHP 8.0+ [cite: 37, 118]
-* [cite_start]**Database:** MySQL [cite: 37, 139]
-* [cite_start]**Frontend:** Tailwind CSS & Laravel Blade Templates [cite: 117, 138]
-* [cite_start]**Security:** Laravel Sanctum & Bcrypt Hashing [cite: 40, 140]
+* **Framework:** Laravel 12
+* **Language:** PHP 8.0+
+* **Database:** MySQL 8.0
+* **Frontend:** Tailwind CSS & Laravel Blade Templates
+* **Security:** Laravel Sanctum & Bcrypt Hashing
 
 ---
 
 ## 👥 System Roles & Actors
 
-[cite_start]The system utilizes Role-Based Access Control (RBAC) to ensure secure and relevant access for four primary user types[cite: 33, 177]:
+The system utilizes Role-Based Access Control (RBAC) to ensure secure access for four primary user types:
 
 | Role | Key Responsibilities |
 | :--- | :--- |
-| **Student** | [cite_start]Submit project ideas (max 3), upload scope documents, and track approval status[cite: 34, 236]. |
-| **Supervisor** | [cite_start]Publish research interests, review project ideas, and manage project workloads (max 8 active projects)[cite: 35, 213]. |
-| **Administrator** | [cite_start]Manage user accounts via CSV import, form evaluation committees, and schedule defense sessions[cite: 36, 173]. |
-| **Committee Member** | [cite_start]Review projects, conduct defenses, and submit feedback via digital rubrics[cite: 341, 348]. |
+| **Student** | Submit project ideas (max 3), upload scope documents, and track status. |
+| **Supervisor** | Publish research interests, review ideas, and manage workload (max 8 projects). |
+| **Administrator** | Manage users, form evaluation committees, and schedule defense sessions. |
+| **Committee Member** | Review projects and submit feedback via standardized digital rubrics. |
 
 ---
 
-## ✨ Core Modules
+## ✨ Core Features
 
-### [cite_start]1. Project Idea & Approval [cite: 123]
-[cite_start]Students browse supervisor profiles to find matches for their research interests[cite: 216]. [cite_start]Once an idea is submitted, supervisors can approve, reject, or request revisions[cite: 385].
+### 1. Automated Workflow
+The system manages a linear workflow:
+1. Supervisor publishes interests.
+2. Student submits idea.
+3. Supervisor reviews (Approve/Reject/Revision Required).
+4. Student uploads Scope Document (PDF <10MB).
+5. Administrator schedules Defense.
 
-### [cite_start]2. Scope Document Management [cite: 124]
-Approved projects move to the documentation phase. [cite_start]The system supports PDF uploads (up to 10MB) and maintains version control to track document evolution[cite: 258, 268].
+### 2. Intelligent Defense Scheduling
+The system features a conflict detection algorithm that prevents double-booking for:
+* **Venues:** Ensures a room isn't used for two defenses at once.
+* **Faculty:** Ensures committee members aren't scheduled for overlapping sessions.
+* **Buffers:** Enforces a mandatory 30-minute buffer between sessions.
 
-### [cite_start]3. Evaluation Committee Management [cite: 125]
-[cite_start]Administrators form committees of at least two faculty members[cite: 285]. [cite_start]The system automates defense scheduling with built-in conflict detection for venues and participants[cite: 290, 1333].
-
-### [cite_start]4. Administrative Dashboard [cite: 126]
-[cite_start]A comprehensive dashboard provides real-time analytics, project metrics, and the ability to export reports in PDF or Excel formats[cite: 73, 310, 318].
+### 3. Supervisor Capacity Tracking
+To ensure quality mentorship, the system enforces a "Hard Cap" of 8 active projects per supervisor. The system automatically disables a supervisor's "accept" button once they reach their assigned limit (default is 6).
 
 ---
 
-## 📊 Design Architecture
+## 📊 System Design
 
 ### Entity-Relationship Diagram (ERD)
-[cite_start]The system uses a normalized relational schema to ensure data integrity across users, projects, and evaluations[cite: 987, 988].
+The database follows a normalized relational model to handle complex many-to-many relationships between faculty, students, and committees.
 
 
 
-### System Workflow (DFD Level 0)
-[cite_start]The context diagram illustrates the high-level information flow between the system and its four primary actors[cite: 563, 571].
+### Data Flow Diagram (DFD Level 1)
+This diagram illustrates how data moves through the functional modules of the system, including User Management and Project Handling.
 
 
 
 ---
 
-## 🔒 Security Features
+## 🔒 Security & Performance
 
-* [cite_start]**Input Validation:** Protects against SQL Injection, XSS, and CSRF attacks[cite: 40, 467].
-* [cite_start]**Password Security:** All credentials are encrypted using the bcrypt algorithm[cite: 40, 458].
-* [cite_start]**Session Management:** Automatic session timeout after 30 minutes of inactivity[cite: 473].
-* [cite_start]**Audit Logging:** Critical user actions are logged with timestamps for accountability[cite: 546].
-
----
-
-## ⚙️ Installation Requirements
-
-### [cite_start]Hardware Baseline[cite: 1138, 1140]:
-* **App Server:** 2 vCPU, 4 GB RAM.
-* **DB Server:** 4 vCPU, 8 GB RAM (MySQL 8).
-
-### [cite_start]Software Stack[cite: 1144, 1146]:
-* **OS:** Ubuntu LTS or Windows.
-* **Web Server:** Nginx 1.24+.
-* **Runtime:** PHP 8.3+, Node.js 20+.
+* **Attack Protection:** Built-in protection against SQL Injection, XSS, and CSRF attacks.
+* **Encrypted Storage:** All passwords are hashed using **bcrypt** with unique salts.
+* **High Availability:** Designed for 99.5% uptime and 200 concurrent users.
+* **Responsive UI:** Fully mobile-responsive design for access on tablets and phones.
