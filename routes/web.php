@@ -19,20 +19,15 @@ use App\Http\Controllers\Admin\EvaluatorController as AdminEvaluatorController;
 use App\Http\Controllers\Admin\FypPhaseController;
 use App\Http\Controllers\Admin\ScopeReviewController;
 
-// --- Publicly Accessible Routes ---
-// Route::get('/', function () {
-//     return view('welcome');
+// Route::get('/run-seeder', function () {
+    
+//     // 1. Run the seeder command
+//     // We use --force because we are in production
+//     \Illuminate\Support\Facades\Artisan::call('db:seed --force');
+    
+//     // 2. Return the output so you can see what happened
+//     return 'Seeding completed! <br><pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
 // });
-
-Route::get('/run-seeder', function () {
-    
-    // 1. Run the seeder command
-    // We use --force because we are in production
-    \Illuminate\Support\Facades\Artisan::call('db:seed --force');
-    
-    // 2. Return the output so you can see what happened
-    return 'Seeding completed! <br><pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
-});
 
 Route::middleware('guest')->group(function () {
     // Welcome page with role selection
