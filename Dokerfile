@@ -1,0 +1,26 @@
+# Use an official PHP image with Apache
+FROM php:8.2-apache
+
+# 1. Install system dependencies (for zip, git, and Postgres/MySQL)
+RUN apt-get update && apt-get install -y \
+    libpq-dev libzip-dir zip unzip git \
+    && docker-php-ext-install pdo_pgsql pdo_mysql zip
+
+# 2. Tell Apache to look at Laravel's /public folder
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN a2enmod rewrite
+
+# 3. Copy your project files into the container
+COPY . /var/www/html
+WORKDIR /var/www/html
+
+# 4. Install Composer (the PHP package manager)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-dev --optimize-autoloader
+
+# 5. Set folder permissions so Laravel can write logs/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# 6. Expose port 80 (standard web port)
+EXPOSE 80
