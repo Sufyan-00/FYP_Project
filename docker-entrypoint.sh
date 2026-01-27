@@ -12,6 +12,8 @@ php artisan view:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Creating storage link..."
+php artisan storage:link
 # 3. Start Apache (this passes control back to the Docker command)
 echo "Starting Apache..."
 exec docker-php-entrypoint apache2-foreground
