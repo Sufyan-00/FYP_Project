@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         // Add 'completed' to the list of allowed ENUM values
-        DB::statement("ALTER TABLE projects MODIFY COLUMN status ENUM('pending', 'approved', 'rejected', 'completed') NOT NULL DEFAULT 'pending'");
+      //  DB::statement("ALTER TABLE projects MODIFY COLUMN status ENUM('pending', 'approved', 'rejected', 'completed') NOT NULL DEFAULT 'pending'");
     }
 
     /**
@@ -22,6 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         // Revert the ENUM list back to its original state
-        DB::statement("ALTER TABLE projects MODIFY COLUMN status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending'");
+       // DB::statement("ALTER TABLE projects MODIFY COLUMN status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending'");
     }
 };
