@@ -39,8 +39,8 @@
                             <select name="format" id="format" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark: focus:ring-indigo-600 rounded-md shadow-sm" required>
                                 <option value="">Select Format</option>
                                 <option value="csv" @selected(old('format') == 'csv')>CSV (Excel Compatible)</option>
-                                <option value="excel" @selected(old('format') == 'excel')>Excel</option>
-                                <option value="pdf" @selected(old('format') == 'pdf')>PDF</option>
+                                <!-- <option value="excel" @selected(old('format') == 'excel')>Excel</option>
+                                <option value="pdf" @selected(old('format') == 'pdf')>PDF</option> -->
                             </select>
                             <x-input-error :messages="$errors->get('format')" class="mt-2" />
                         </div>

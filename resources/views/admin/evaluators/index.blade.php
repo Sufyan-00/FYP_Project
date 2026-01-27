@@ -56,7 +56,7 @@
                                         <form action="{{ route('admin.evaluators.destroy', $e) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover: text-red-900 text-xs"
+                                            <button type="submit" class="text-red-600 hover:text-red-900 text-xs"
                                                     onclick="return confirm('Remove {{ $e->user->name }} from evaluator directory? ')">
                                                 Remove
                                             </button>

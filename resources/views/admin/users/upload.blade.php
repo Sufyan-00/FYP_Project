@@ -30,7 +30,7 @@
                             <li>The <span class="font-mono">name</span> column should contain the user's full name.</li>
                             <li>The <span class="font-mono">email</span> column must contain a unique, valid email address.</li>
                             <li>The <span class="font-mono">role</span> column must be one of: <span class="font-mono">student</span> or <span class="font-mono">supervisor</span>.</li>
-                            <li>A default password ('<span class="font-mono">password</span>') will be assigned to all new users. They will be required to change it upon first login.</li>
+                            <li>A default password ('<span class="font-mono">password</span>') will be assigned to all new users.</li>
                         </ul>
                         <div class="mt-4">
                             <a href="{{ route('admin.users.template.download') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">

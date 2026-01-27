@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\DefenceSessionController;
 use App\Http\Controllers\Member\SessionEvaluationController;
 use App\Http\Controllers\Admin\EvaluatorController as AdminEvaluatorController;
+use App\Http\Controllers\Admin\FypPhaseController;
+use App\Http\Controllers\Admin\ScopeReviewController;
 
 // --- Publicly Accessible Routes ---
 // Route::get('/', function () {
@@ -78,7 +80,9 @@ Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
     Route::get('/supervisor/profile', [SupervisorController::class, 'editProfile'])->name('supervisor.profile.edit');
     Route::patch('/supervisor/profile', [SupervisorController::class, 'updateProfile'])->name('supervisor.profile.update');
     Route::get('/supervisor/dashboard', [SupervisorDashboardController::class, 'index'])->name('supervisor.dashboard');
-    
+    // NEW: Supervisor Scope Document Review Routes
+    Route::patch('/supervisor/scope-reviews/{scopeDocument}/approve', [SupervisorController::class, 'approveScopeDocument'])->name('supervisor.scope-reviews.approve');
+    Route::patch('/supervisor/scope-reviews/{scopeDocument}/request-revision', [SupervisorController::class, 'requestScopeRevision'])->name('supervisor.scope-reviews.request-revision');
 });
 
 // Committee member routes
@@ -99,7 +103,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
     // Enhanced user management routes
     Route::patch('/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
-    Route::patch('/users/{user}/update-slots', [AdminUserController:: class, 'updateSlots'])->name('users.update-slots');
+    Route::patch('/users/{user}/update-slots', [AdminUserController::class, 'updateSlots'])->name('users.update-slots');
     
     // Reports
     Route::resource('reports', ReportController::class)->except(['show', 'edit', 'update']);
@@ -145,7 +149,27 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
         ->name('defence-sessions.assign-evaluators');
     Route::patch('defence-sessions/{defenceSession}/status', [\App\Http\Controllers\Admin\DefenceSessionController::class, 'updateStatus'])
         ->name('defence-sessions.update-status');
-});
 
+    Route::prefix('phases')->name('phases.')->group(function () {
+        Route::get('/', [FypPhaseController::class, 'index'])->name('index');
+        Route::get('/create', [FypPhaseController::class, 'create'])->name('create');
+        Route::post('/', [FypPhaseController::class, 'store'])->name('store');
+        Route::get('/{phase}', [FypPhaseController::class, 'show'])->name('show');
+        Route::get('/{phase}/edit', [FypPhaseController::class, 'edit'])->name('edit');
+        Route::put('/{phase}', [FypPhaseController::class, 'update'])->name('update');
+        Route::delete('/{phase}', [FypPhaseController::class, 'destroy'])->name('destroy');
+        Route::patch('/{phase}/toggle-status', [FypPhaseController::class, 'toggleStatus'])->name('toggle-status');
+        Route::patch('/{phase}/toggle-late', [FypPhaseController::class, 'toggleLate'])->name('toggle-late');
+        Route::patch('/{phase}/extend-deadline', [FypPhaseController::class, 'extendDeadline'])->name('extend-deadline');
+    });
+
+    Route::prefix('scope-reviews')->name('scope-reviews.')->group(function () {
+        Route::get('/', [ScopeReviewController::class, 'index'])->name('index');
+        Route::get('/{scopeDocument}', [ScopeReviewController::class, 'show'])->name('show');
+        Route::patch('/{scopeDocument}/approve', [ScopeReviewController::class, 'approve'])->name('approve');
+        Route::patch('/{scopeDocument}/reject', [ScopeReviewController::class, 'reject'])->name('reject');
+        Route::patch('/{scopeDocument}/request-revision', [ScopeReviewController::class, 'requestRevision'])->name('request-revision');
+    });
+});
 
 require __DIR__.'/auth.php';

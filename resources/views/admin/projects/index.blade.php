@@ -53,7 +53,7 @@
                                             /
                                             {{-- Enhanced delete validation --}}
                                             @php
-                                                $hasDefenceSessions = \App\Models\DefenceSession:: where('project_id', $project->id)->exists();
+                                                $hasDefenceSessions = \App\Models\DefenceSession::where('project_id', $project->id)->exists();
                                                 $hasScopeDocuments = $project->scopeDocuments()->exists();
                                                 $canDelete = !$hasDefenceSessions;
                                                 

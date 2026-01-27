@@ -30,7 +30,7 @@
 
                         <!-- Project Title -->
                         <div class="mb-4">
-                            <label for="title" class="block text-sm font-medium text-gray-700 dark: text-gray-300 mb-2">
+                            <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Project Title
                             </label>
                             <input type="text" 
@@ -49,18 +49,18 @@
                             <textarea id="description" 
                                       name="description" 
                                       rows="4"
-                                      class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus: ring-indigo-600 rounded-md shadow-sm"
+                                      class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                                       required>{{ old('description') }}</textarea>
                         </div>
 
                         <!-- Student Selection -->
                         <div class="mb-4">
-                            <label for="student_id" class="block text-sm font-medium text-gray-700 dark: text-gray-300 mb-2">
+                            <label for="student_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Assign to Student
                             </label>
                             <select id="student_id" 
                                     name="student_id"
-                                    class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus: ring-indigo-600 rounded-md shadow-sm"
+                                    class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
                                     required>
                                 <option value="">Select a student</option>
                                 @foreach($students as $student)
@@ -81,7 +81,7 @@
                             </label>
                             <select id="supervisor_id" 
                                     name="supervisor_id"
-                                    class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark: focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                 <option value="">Select a supervisor (optional)</option>
                                 @foreach($supervisors as $supervisor)
                                     <option value="{{ $supervisor->id }}" @selected(old('supervisor_id') == $supervisor->id)>

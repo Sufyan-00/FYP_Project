@@ -24,7 +24,7 @@ class DefenceSession extends Model
     // Relationships
     public function committee(): BelongsTo
     {
-        return $this->belongsTo(Committee:: class);
+        return $this->belongsTo(Committee::class);
     }
 
     public function project(): BelongsTo

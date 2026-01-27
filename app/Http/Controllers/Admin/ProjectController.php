@@ -6,17 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\DefenceSession;
+use App\Models\FypPhase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
     /**
-     * Display a listing of all projects for the administrator. 
+     * Display a listing of all projects for the administrator.
      */
     public function index(Request $request)
     {
-        $query = Project::with(['student', 'supervisor']);
+        $query = Project::with(['student', 'supervisor', 'latestScopeDocument']);
 
         // Filter by status if provided
         if ($request->filled('status')) {
@@ -26,6 +27,21 @@ class ProjectController extends Controller
         // Filter by supervisor if provided
         if ($request->filled('supervisor')) {
             $query->where('supervisor_id', $request->supervisor);
+        }
+
+        // Filter by phase if provided
+        if ($request->filled('phase')) {
+            $query->where('current_phase', $request->phase);
+        }
+
+        // Filter by semester if provided
+        if ($request->filled('semester')) {
+            $query->where('semester', $request->semester);
+        }
+
+        // Filter late submissions
+        if ($request->filled('is_late') && $request->is_late === '1') {
+            $query->where('is_late', true);
         }
 
         // Search by title or student name
@@ -43,8 +59,64 @@ class ProjectController extends Controller
 
         // For filter dropdowns
         $supervisors = User::where('role', 'supervisor')->orderBy('name')->get();
+        $semesters = Project::whereNotNull('semester')
+                            ->distinct()
+                            ->orderBy('semester', 'desc')
+                            ->pluck('semester');
+        $phases = config('fyp.project_phases');
 
-        return view('admin.projects.index', compact('projects', 'supervisors'));
+        // Statistics
+        $stats = [
+            'total' => Project::count(),
+            'pending' => Project::where('status', 'pending')->count(),
+            'approved' => Project::where('status', 'approved')->count(),
+            'rejected' => Project::where('status', 'rejected')->count(),
+            'late' => Project::where('is_late', true)->count(),
+        ];
+
+        return view('admin.projects.index', compact('projects', 'supervisors', 'semesters', 'phases', 'stats'));
+    }
+
+    /**
+     * Display the specified project with all details.
+     */
+    public function show(Project $project)
+    {
+        $project->load([
+            'student:id,name,email',
+            'supervisor:id,name,email',
+            'scopeDocuments' => function ($query) {
+                $query->with(['uploader:id,name', 'reviewer:id,name'])
+                      ->orderBy('created_at', 'desc');
+            },
+            'defenceSessions' => function ($query) {
+                $query->with(['committee:id,name', 'scheduledBy:id,name'])
+                      ->orderBy('scheduled_at', 'desc');
+            },
+            'phaseSubmissions' => function ($query) {
+                $query->with(['phase:id,name,slug', 'reviewer:id,name'])
+                      ->orderBy('created_at', 'desc');
+            },
+        ]);
+
+        // Get current phase details
+        $currentPhaseDetails = $project->getCurrentPhaseDetails();
+        $deadlineInfo = $project->getCurrentPhaseDeadlineInfo();
+
+        // Get all phases for this semester (for timeline)
+        $semesterPhases = [];
+        if ($project->semester) {
+            $semesterPhases = FypPhase::where('semester', $project->semester)
+                                      ->orderBy('order')
+                                      ->get();
+        }
+
+        return view('admin.projects.show', compact(
+            'project',
+            'currentPhaseDetails',
+            'deadlineInfo',
+            'semesterPhases'
+        ));
     }
 
     /**
@@ -61,7 +133,12 @@ class ProjectController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.projects.create', compact('students', 'supervisors'));
+        // Get available semesters
+        $semesters = FypPhase::distinct()
+                             ->orderBy('semester', 'desc')
+                             ->pluck('semester');
+
+        return view('admin.projects.create', compact('students', 'supervisors', 'semesters'));
     }
 
     /**
@@ -72,63 +149,10 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'student_id' => ['required', 'exists: users,id'],
-            'supervisor_id' => ['nullable', 'exists:users,id'],
-            'status' => ['required', 'in:pending,approved,rejected'],
-        ]);
-
-        // Verify student role
-        $student = User::findOrFail($validated['student_id']);
-        if ($student->role !== 'student') {
-            return back()->withErrors(['student_id' => 'Selected user must be a student.'])->withInput();
-        }
-
-        // Verify supervisor role if provided
-        if ($validated['supervisor_id']) {
-            $supervisor = User:: findOrFail($validated['supervisor_id']);
-            if ($supervisor->role !== 'supervisor') {
-                return back()->withErrors(['supervisor_id' => 'Selected user must be a supervisor.'])->withInput();
-            }
-        }
-
-        // Check if student already has a project
-        if ($student->projects()->exists()) {
-            return back()->withErrors(['student_id' => 'Student already has a project assigned.'])->withInput();
-        }
-
-        Project::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'student_id' => $validated['student_id'],
-            'supervisor_id' => $validated['supervisor_id'],
-            'status' => $validated['status'],
-        ]);
-
-        return redirect()->route('admin.projects.index')
-            ->with('success', 'Project created successfully.');
-    }
-
-    /**
-     * Display the specified project.
-     */
-    public function show(Project $project)
-    {
-        $project->load(['student', 'supervisor', 'defenceSessions.committee']);
-
-        return view('admin.projects.show', compact('project'));
-    }
-
-    /**
-     * Update the specified project in storage.
-     */
-    public function update(Request $request, Project $project)
-    {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
             'student_id' => ['required', 'exists:users,id'],
-            'supervisor_id' => ['nullable', 'exists:users,id'],
-            'status' => ['required', 'in:pending,approved,rejected'],
+            'supervisor_id' => ['nullable', 'exists: users,id'],
+            'status' => ['required', 'in: pending,approved,rejected'],
+            'semester' => ['nullable', 'string', 'max: 100'],
         ]);
 
         // Verify student role
@@ -145,20 +169,84 @@ class ProjectController extends Controller
             }
         }
 
-        // Check if student already has another project (excluding current)
-        if ($student->projects()->where('id', '!=', $project->id)->exists()) {
-            return back()->withErrors(['student_id' => 'Student already has another project assigned.'])->withInput();
+        // Check if student already has a project
+        if ($student->projects()->exists()) {
+            return back()->withErrors(['student_id' => 'Student already has a project assigned.'])->withInput();
         }
 
-        $project->update([
+        $project = Project::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'student_id' => $validated['student_id'],
+            'user_id' => $validated['student_id'],
             'supervisor_id' => $validated['supervisor_id'],
             'status' => $validated['status'],
+            'semester' => $validated['semester'],
+            'current_phase' => Project::PHASE_IDEA,
         ]);
 
-        return redirect()->route('admin.projects.index')
+        return redirect()
+            ->route('admin.projects.show', $project)
+            ->with('success', 'Project created successfully.');
+    }
+
+    /**
+     * Show the form for editing the specified project.
+     */
+    public function edit(Project $project)
+    {
+        $project->load(['student', 'supervisor']);
+
+        $students = User::where('role', 'student')
+        ->where(function ($query) use ($project) {
+            // Include students without projects OR the current project's student
+            $query->whereDoesntHave('projects')
+                  ->orWhere('id', $project->user_id);
+        })
+        ->orderBy('name')
+        ->get();
+
+        $supervisors = User::where('role', 'supervisor')
+            ->orderBy('name')
+            ->get();
+
+        $semesters = FypPhase::distinct()
+                             ->orderBy('semester', 'desc')
+                             ->pluck('semester');
+
+        $phases = config('fyp.project_phases');
+
+        return view('admin.projects.edit', compact('project','students', 'supervisors', 'semesters', 'phases'));
+    }
+
+    /**
+     * Update the specified project in storage.
+     */
+    public function update(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max: 255'],
+            'description' => ['required', 'string'],
+            'supervisor_id' => ['nullable', 'exists:users,id'],
+            'status' => ['required', 'in:pending,approved,rejected,completed'],
+            'current_phase' => ['required', 'in: idea,scope,defence,completed'],
+            'semester' => ['nullable', 'string', 'max:100'],
+            'is_late' => ['boolean'],
+        ]);
+
+        // Verify supervisor role if provided
+        if ($validated['supervisor_id']) {
+            $supervisor = User::findOrFail($validated['supervisor_id']);
+            if ($supervisor->role !== 'supervisor') {
+                return back()->withErrors(['supervisor_id' => 'Selected user must be a supervisor.'])->withInput();
+            }
+        }
+
+        $validated['is_late'] = $request->boolean('is_late');
+
+        $project->update($validated);
+
+        return redirect()
+            ->route('admin.projects.show', $project)
             ->with('success', 'Project updated successfully.');
     }
 
@@ -167,33 +255,20 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        try {
-            DB::beginTransaction();
-
-            // Check if project has defence sessions
-            $hasDefenceSessions = DefenceSession::where('project_id', $project->id)->exists();
-            
-            if ($hasDefenceSessions) {
-                DB::rollBack();
-                return back()->withErrors([
-                    'error' => 'Cannot delete project with defence sessions.  Please remove sessions first.'
-                ]);
-            }
-
-            $projectTitle = $project->title;
-            $project->delete();
-
-            DB::commit();
-
-            return redirect()->route('admin.projects.index')
-                ->with('success', "Project \"{$projectTitle}\" deleted successfully.");
-
-        } catch (\Exception $e) {
-            DB::rollBack();
+        // Check for defence sessions
+        $sessionCount = $project->defenceSessions()->count();
+        if ($sessionCount > 0) {
             return back()->withErrors([
-                'error' => 'Failed to delete project.  Please try again.'
+                'error' => "Cannot delete project with {$sessionCount} defence session(s)."
             ]);
         }
+
+        $projectTitle = $project->title;
+        $project->delete();
+
+        return redirect()
+            ->route('admin.projects.index')
+            ->with('success', 'Project "' . $projectTitle . '" deleted successfully.');
     }
 
     /**
@@ -202,12 +277,37 @@ class ProjectController extends Controller
     public function updateStatus(Request $request, Project $project)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:pending,approved,rejected'],
+            'status' => ['required', 'in:pending,approved,rejected,completed'],
+            'rejection_reason' => ['nullable', 'required_if:status,rejected', 'string', 'max:1000'],
         ]);
 
-        $project->update(['status' => $validated['status']]);
+        $updateData = ['status' => $validated['status']];
 
-        return redirect()->route('admin.projects.index')
-            ->with('success', "Project status updated to {$validated['status']}.");
+        if ($validated['status'] === 'rejected') {
+            $updateData['rejection_reason'] = $validated['rejection_reason'];
+        }
+
+        // If approved and in idea phase, advance to scope phase
+        if ($validated['status'] === 'approved' && $project->isIdeaPhase()) {
+            $updateData['current_phase'] = Project::PHASE_SCOPE;
+        }
+
+        $project->update($updateData);
+
+        return back()->with('success', 'Project status updated to ' . ucfirst($validated['status']) . '.');
+    }
+
+    /**
+     * Assign semester to project.
+     */
+    public function assignSemester(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'semester' => ['required', 'string', 'max:100'],
+        ]);
+
+        $project->update(['semester' => $validated['semester']]);
+
+        return back()->with('success', 'Project assigned to semester ' . $validated['semester'] .  '.');
     }
 }

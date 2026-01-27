@@ -16,7 +16,7 @@ class UserController extends Controller
     public function index()
     {
         // Fetch all users with supervisor profiles, newest first, and paginate the results
-        $users = User:: with('supervisorProfile')->orderBy('created_at', 'desc')->paginate(15);
+        $users = User::with('supervisorProfile')->orderBy('created_at', 'desc')->paginate(15);
 
         return view('admin.users.index', compact('users'));
     }
@@ -95,7 +95,7 @@ class UserController extends Controller
         $defaultPassword = 'password123'; // You can change this default
         
         $user->update([
-            'password' => Hash:: make($defaultPassword),
+            'password' => Hash::make($defaultPassword),
             'password_reset_required' => true, // Optional: force password change on next login
         ]);
 
@@ -162,7 +162,7 @@ class UserController extends Controller
             }
 
             // Create the user
-            $user = User:: create([
+            $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'role' => $data['role'],

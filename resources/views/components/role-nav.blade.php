@@ -56,8 +56,16 @@
             Dashboard
         </x-nav-link>
 
+         <x-nav-link :href="route('admin.phases.index')" :active="request()->routeIs('admin.phases.*')">
+            Phases
+        </x-nav-link>
+
         <x-nav-link :href="route('admin.projects.index')" :active="request()->routeIs('admin.projects.*')">
             Projects
+        </x-nav-link>
+
+        <x-nav-link :href="route('admin.scope-reviews.index')" :active="request()->routeIs('admin.scope-reviews.*')">
+            Scope Reviews
         </x-nav-link>
 
         <x-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">

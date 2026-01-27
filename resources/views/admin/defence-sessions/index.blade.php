@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:  px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Sessions Table with Evaluation Progress -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -94,7 +94,7 @@
                                         <td class="px-4 py-2">
                                             <div class="flex gap-2">
                                                 <a href="{{ route('admin.defence-sessions.show', $session) }}" 
-                                                   class="text-blue-600 hover: underline text-xs">
+                                                   class="text-blue-600 hover:underline text-xs">
                                                     View
                                                 </a>
                                                 @if($session->status === 'scheduled')

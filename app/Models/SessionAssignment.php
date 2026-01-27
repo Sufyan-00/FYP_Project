@@ -40,7 +40,7 @@ class SessionAssignment extends Model
     // Auto-complete when all evaluations are submitted
     protected static function boot()
     {
-        parent:: boot();
+        parent::boot();
 
         // When an evaluation is submitted, check if session should be completed
         static::updated(function ($assignment) {

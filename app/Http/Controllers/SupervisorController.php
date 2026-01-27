@@ -154,21 +154,6 @@ class SupervisorController extends Controller
         return redirect()->route('supervisor.profile.edit')->with('success', 'Profile updated successfully!');
     }
 
-    // public function directory()
-    // {
-    //     // This query now ensures two things:
-    //     // 1. It only fetches users with the 'supervisor' role.
-    //     // 2. It only includes supervisors who HAVE a related profile record (`whereHas`).
-    //     // 3. It eager loads the profile to prevent performance issues (`with`).
-    //     $supervisors = User::where('role', 'supervisor')
-    //                         ->whereHas('supervisorProfile')
-    //                         ->with('supervisorProfile')
-    //                         ->orderBy('name')
-    //                         ->get();
-
-    //     return view('supervisors.directory', ['supervisors' => $supervisors]);
-    // }
-
     public function directory(Request $request)
     {
         $q = trim($request->get('q', ''));
@@ -189,5 +174,58 @@ class SupervisorController extends Controller
             'supervisors' => $supervisors,
             'q' => $q,
         ]);
+    }
+
+        /**
+     * Approve a scope document (Supervisor)
+     */
+    public function approveScopeDocument(Request $request, \App\Models\ScopeDocument $scopeDocument)
+    {
+        // Verify supervisor owns this project
+        $project = $scopeDocument->project;
+        
+        if ($project->supervisor_id !== auth()->id()) {
+            abort(403, 'You are not the supervisor of this project.');
+        }
+
+        // Check if already reviewed
+        if ($scopeDocument->isReviewed() && !$scopeDocument->isPending()) {
+            return back()->withErrors(['error' => 'This document has already been reviewed. ']);
+        }
+
+        $scopeDocument->approve(auth()->id(), $request->feedback);
+
+        // Update project phase if needed
+        if ($project->isScopePhase()) {
+            $project->update(['current_phase' => \App\Models\Project::PHASE_DEFENCE]);
+        }
+
+        return back()->with('success', 'Scope document approved successfully.');
+    }
+
+    /**
+     * Request revision for a scope document (Supervisor)
+     */
+    public function requestScopeRevision(Request $request, \App\Models\ScopeDocument $scopeDocument)
+    {
+        $request->validate([
+            'feedback' => ['required', 'string', 'max: 2000'],
+        ]);
+
+        // Verify supervisor owns this project
+        $project = $scopeDocument->project;
+        
+        if ($project->supervisor_id !== auth()->id()) {
+            abort(403, 'You are not the supervisor of this project.');
+        }
+
+        // Check if already reviewed
+        if ($scopeDocument->isReviewed() && !$scopeDocument->isPending()) {
+            return back()->withErrors(['error' => 'This document has already been reviewed.']);
+        }
+
+        $scopeDocument->requestRevision(auth()->id(), $request->feedback);
+
+        return back()->with('success', 'Revision requested.  Student will be notified.');
     }
 }
