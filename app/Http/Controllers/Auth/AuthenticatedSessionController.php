@@ -12,18 +12,21 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Display the login view with role context.
      */
-    public function create(): View
+    public function create(string $role): View
     {
-        return view('auth.login');
+        return view('auth.login', ['loginRole' => $role]);
     }
 
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request, string $role): RedirectResponse
     {
+        // Set the intended role from the route parameter
+        $request->merge(['intended_role' => $role]);
+        
         $request->authenticate();
 
         if (Auth::user()->status !== 'active') {

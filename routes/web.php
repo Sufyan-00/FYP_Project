@@ -35,8 +35,22 @@ Route::get('/run-seeder', function () {
 });
 
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/', [AuthenticatedSessionController::class, 'store']);
+    // Welcome page with role selection
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('welcome');
+    
+    // Role-specific login routes
+    Route::get('/login/{role}', [AuthenticatedSessionController::class, 'create'])
+        ->where('role', 'student|supervisor|admin')
+        ->name('login.role');
+    Route::post('/login/{role}', [AuthenticatedSessionController::class, 'store'])
+        ->where('role', 'student|supervisor|admin');
+    
+    // Keep legacy login route for compatibility (redirects to welcome)
+    Route::get('/login', function () {
+        return redirect()->route('welcome');
+    })->name('login');
 });
 
 Route::get('/dashboard', [MainDashboardController::class, 'index'])

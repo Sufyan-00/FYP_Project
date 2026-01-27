@@ -2,8 +2,27 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <!-- Role Header -->
+    <div class="text-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            @if($loginRole === 'student')
+                Login as Student
+            @elseif($loginRole === 'supervisor')
+                Login as Supervisor
+            @else
+                Login as Administrator
+            @endif
+        </h2>
+        <a href="{{ route('welcome') }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline mt-2 inline-block">
+            ← Back to role selection
+        </a>
+    </div>
+
+    <form method="POST" action="{{ route('login.role', ['role' => $loginRole]) }}">
         @csrf
+
+        <!-- Hidden Role Field -->
+        <input type="hidden" name="intended_role" value="{{ $loginRole }}">
 
         <!-- Email Address -->
         <div>

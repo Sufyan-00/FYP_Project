@@ -29,11 +29,13 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'intended_role' => ['required', 'string', 'in:student,supervisor,admin'],
         ];
     }
 
     /**
      * Attempt to authenticate the request's credentials.
+     * Also validates that the user's role matches the intended login portal.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -46,6 +48,23 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // Check if the authenticated user's role matches the intended role
+        $user = Auth::user();
+        $intendedRole = $this->input('intended_role');
+        
+        if ($user->role !== $intendedRole) {
+            // Logout the user since their role doesn't match
+            Auth::logout();
+            
+            RateLimiter::hit($this->throttleKey());
+            
+            $roleLabel = ucfirst($intendedRole);
+            
+            throw ValidationException::withMessages([
+                'email' => "These credentials do not match a {$roleLabel} account. Please use the correct login portal for your role.",
             ]);
         }
 
