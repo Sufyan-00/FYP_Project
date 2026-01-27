@@ -1,20 +1,4 @@
 <x-app-layout>
-    <!-- <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Recycle Bin — Document Templates</h2>
-            <a href="{{ route('admin.templates.index') }}"  class="text-sm text-blue-600 hover:text-blue-800">Back to Templates</a>
-
-            @if (($templates ?? null) && $templates->total() > 0)
-                <form action="{{ route('admin.templates.trash.clear') }}" method="POST" onsubmit="return confirm('Permanently delete ALL items in the Recycle Bin? This cannot be undone.');">
-                    @csrf
-                    @method('DELETE')
-                    <button class="px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700">
-                        Clear All
-                    </button>
-                </form>
-            @endif
-        </div>
-    </x-slot> -->
     <x-slot name="header">
     @php
         $hasItems = ($templates ?? null) && $templates->total() > 0;

@@ -100,7 +100,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/users/upload', [AdminUserController::class, 'showUploadForm'])->name('users.upload.form');
     Route::post('/users/upload', [AdminUserController::class, 'processUpload'])->name('users.upload.process');
     Route::get('/users/upload/template', [AdminUserController::class, 'downloadTemplate'])->name('users.template.download');
-    Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
+    // Route::get('projects', [AdminProjectController::class, 'index'])->name('projects.index');
     // Enhanced user management routes
     Route::patch('/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
     Route::patch('/users/{user}/update-slots', [AdminUserController::class, 'updateSlots'])->name('users.update-slots');
@@ -118,7 +118,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.'
     Route::get('/templates/trash', [DocumentTemplateController::class, 'trash'])->name('templates.trash');
     Route::patch('/templates/{template}/restore', [DocumentTemplateController::class, 'restore'])->name('templates.restore');
     Route::delete('/templates/{template}/force', [DocumentTemplateController::class, 'forceDelete'])->name('templates.force-delete');
-    Route::get('/templates/cleartrash', [DocumentTemplateController::class, 'clearTrash'])->name('templates.trash.clear');
+    Route::get('/templates/cleartrash', [DocumentTemplateController::class, 'clearTrash'])->name('templates.trash.confirm');
     Route::delete('/templates/cleartrash', [DocumentTemplateController::class, 'clearTrash'])->name('templates.trash.clear');
 
     // Scope Document versioning mgmt (existing)
