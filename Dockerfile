@@ -28,7 +28,7 @@ WORKDIR /var/www/html
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # 6. Install Node dependencies and build Vite assets
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 # 7. Set folder permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
