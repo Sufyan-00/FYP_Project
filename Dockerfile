@@ -1,13 +1,16 @@
 # Use an official PHP image with Apache
 FROM php:8.2-apache
 
-# 1. Install system dependencies
-# FIX: Changed 'libzip-dir' to 'libzip-dev' so the build doesn't fail
+# 1. Install system dependencies + Node.js 20
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
-    zip unzip git \
+    zip unzip git curl \
     && docker-php-ext-install pdo_pgsql pdo_mysql zip
+
+# Install Node.js 20 (needed to build Vite/Tailwind assets)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
 
 # 2. Tell Apache to look at Laravel's /public folder
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -21,17 +24,19 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY . /var/www/html
 WORKDIR /var/www/html
 
-# 5. Install dependencies
-# Using --ignore-platform-reqs is sometimes safer in Docker if local php version differs
-RUN composer install --no-dev --optimize-autoloader
+# 5. Install PHP dependencies (no dev)
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 6. Set folder permissions
+# 6. Install Node dependencies and build Vite assets
+RUN npm ci && npm run build
+
+# 7. Set folder permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 7. Expose port 80
+# 8. Expose port (Heroku dynamically overrides via $PORT at runtime)
 EXPOSE 80
 
-# 8. Setup Entrypoint
+# 9. Setup Entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
