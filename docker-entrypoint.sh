@@ -23,24 +23,11 @@ php artisan storage:link || true
 PORT=${PORT:-80}
 echo "Configuring Apache on port ${PORT}..."
 
-cat > /etc/apache2/ports.conf <<EOF
-Listen ${PORT}
-EOF
+# Update ports.conf to listen on the correct port
+sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf
 
-cat > /etc/apache2/sites-available/000-default.conf <<EOF
-<VirtualHost *:${PORT}>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/html/public
-
-    <Directory /var/www/html/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog \${APACHE_LOG_DIR}/error.log
-    CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOF
+# Update the VirtualHost to bind to the correct port
+sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/g" /etc/apache2/sites-available/000-default.conf
 
 echo "=== Starting Apache on port ${PORT} ==="
 exec apache2-foreground
