@@ -1,17 +1,17 @@
 #!/bin/bash
-
-# Exit immediately if a command exits with a non-zero status
 set -e
 
-echo "=== Starting FYP Proposal System ==="
+echo "=== Starting FYP Proposal System (Nginx + PHP-FPM) ==="
 
-# 1. Cache configuration for speed
+cd /var/www/html
+
+# 1. Cache Laravel config, routes, views
 echo "Caching config, routes, views..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# 2. Run database migrations
+# 2. Run migrations
 echo "Running migrations..."
 php artisan migrate --force
 
@@ -19,15 +19,15 @@ php artisan migrate --force
 echo "Creating storage link..."
 php artisan storage:link || true
 
-# 4. Configure Apache to listen on Heroku's dynamic PORT
+# 4. Configure Nginx with dynamic Heroku PORT
 PORT=${PORT:-80}
-echo "Configuring Apache on port ${PORT}..."
+echo "Configuring Nginx on port ${PORT}..."
+envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
-# Update ports.conf to listen on the correct port
-sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf
+# 5. Start PHP-FPM in background
+echo "Starting PHP-FPM..."
+php-fpm --daemonize
 
-# Update the VirtualHost to bind to the correct port
-sed -i "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/g" /etc/apache2/sites-available/000-default.conf
-
-echo "=== Starting Apache on port ${PORT} ==="
-exec apache2-foreground
+# 6. Start Nginx in foreground (keeps container running)
+echo "=== Starting Nginx on port ${PORT} ==="
+exec nginx -c /etc/nginx/nginx.conf
