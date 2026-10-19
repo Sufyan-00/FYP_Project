@@ -21,6 +21,11 @@ USER_COUNT=$(php artisan tinker --execute="echo App\Models\User::count();" 2>/de
 if [ -z "$USER_COUNT" ] || [ "$USER_COUNT" = "0" ]; then
     echo "Database is empty — running seeders..."
     php artisan db:seed --force
+
+    # Run specific class seeder
+    echo "Running GuestModeSeeder..."
+    php artisan db:seed --class=GuestModeSeeder --force
+    
     echo "Seeding complete!"
 else
     echo "Database already seeded (${USER_COUNT} users found) — skipping."
