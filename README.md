@@ -1,4 +1,5 @@
 # FYP Proposal Approval System (CUI Vehari)
+[Live Preview](https://fyp-proposal-system-1930b2ff9396.herokuapp.com/)
 
 A comprehensive web-based platform designed to digitize and automate the Final Year Project (FYP) management process at COMSATS University Islamabad, Vehari Campus. This system replaces traditional paper-based workflows with a streamlined, transparent, and efficient digital environment.
 
