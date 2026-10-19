@@ -14,10 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'supervisor' => \App\Http\Middleware\SupervisorMiddleware::class,
-            'evaluator' => \App\Http\Middleware\EnsureUserIsEvaluator::class,
+            'role'           => \App\Http\Middleware\CheckRole::class,
+            'admin'          => \App\Http\Middleware\AdminMiddleware::class,
+            'supervisor'     => \App\Http\Middleware\SupervisorMiddleware::class,
+            'evaluator'      => \App\Http\Middleware\EnsureUserIsEvaluator::class,
+            'guest.readonly' => \App\Http\Middleware\GuestReadOnly::class,
         ]);
         
     })

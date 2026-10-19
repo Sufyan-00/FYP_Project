@@ -18,6 +18,7 @@ use App\Http\Controllers\Member\SessionEvaluationController;
 use App\Http\Controllers\Admin\EvaluatorController as AdminEvaluatorController;
 use App\Http\Controllers\Admin\FypPhaseController;
 use App\Http\Controllers\Admin\ScopeReviewController;
+use App\Http\Controllers\GuestModeController;
 
 // Route::get('/run-seeder', function () {
     
@@ -46,7 +47,18 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
         return redirect()->route('welcome');
     })->name('login');
+
+    // --- Guest / Demo Mode ---
+    // One-click demo login: automatically authenticates as a pre-seeded demo account.
+    Route::get('/guest/login/{role}', [GuestModeController::class, 'login'])
+        ->where('role', 'student|supervisor|admin')
+        ->name('guest.login');
 });
+
+// Guest logout (accessible while authenticated as demo user)
+Route::get('/guest/logout', [GuestModeController::class, 'logout'])
+    ->middleware('auth')
+    ->name('guest.logout');
 
 Route::get('/dashboard', [MainDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -75,7 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // --- Student Specific Routes ---
-Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:student', 'guest.readonly'])->group(function () {
     Route::resource('projects', StudentProjectController::class);
     Route::get('/projects/{project}/scope/create', [StudentProjectController::class, 'createScopeDocument'])->name('projects.scope.create');
     Route::post('/projects/{project}/scope', [StudentProjectController::class, 'storeScopeDocument'])->name('projects.scope.store');
@@ -86,7 +98,7 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
 });
 
 // --- Supervisor Specific Routes ---
-Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:supervisor', 'guest.readonly'])->group(function () {
     Route::get('/supervisor/projects', [SupervisorController::class, 'index'])->name('supervisor.projects');
     Route::patch('/supervisor/projects/{project}/approve', [SupervisorController::class, 'approve'])->name('supervisor.projects.approve');
     Route::patch('/supervisor/projects/{project}/reject', [SupervisorController::class, 'reject'])->name('supervisor.projects.reject');
@@ -101,14 +113,14 @@ Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
 });
 
 // Committee member routes
-    Route::middleware(['auth', 'evaluator'])->prefix('member')->name('member.')->group(function ()  {
+    Route::middleware(['auth', 'evaluator', 'guest.readonly'])->prefix('member')->name('member.')->group(function ()  {
         Route::get('sessions', [SessionEvaluationController::class, 'index'])->name('sessions.index');
         Route::get('assignments/{assignment}/evaluate', [SessionEvaluationController::class, 'evaluate'])->name('sessions.evaluate');
         Route::post('assignments/{assignment}/submit', [SessionEvaluationController::class, 'submit'])->name('sessions.submit');
     });
 
 // --- Admin Routes ---
-Route::prefix('admin')->middleware(['auth', 'verified', 'admin'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'verified', 'admin', 'guest.readonly'])->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', AdminUserController::class)->only(['index', 'edit', 'update']);
     Route::patch('/users/{user}/status', [AdminUserController::class, 'toggleStatus'])->name('users.toggleStatus');
