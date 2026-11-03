@@ -5,7 +5,7 @@ A comprehensive web-based platform designed to digitize and automate the Final Y
 
 ---
 
-## 🚀 Project Overview
+## Project Overview
 
 The traditional manual process for managing student projects often suffers from slow approval workflows, lack of transparency, and inefficient communication. This project solves these challenges by providing a centralized platform for the entire FYP lifecycle—from initial idea submission to final defense evaluation.
 
@@ -16,7 +16,7 @@ The traditional manual process for managing student projects often suffers from 
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 * **Framework:** Laravel 12
 * **Language:** PHP 8.0+
@@ -26,7 +26,7 @@ The traditional manual process for managing student projects often suffers from 
 
 ---
 
-## 👥 System Roles & Actors
+## System Roles & Actors
 
 The system utilizes Role-Based Access Control (RBAC) to ensure secure access for four primary user types:
 
@@ -39,7 +39,7 @@ The system utilizes Role-Based Access Control (RBAC) to ensure secure access for
 
 ---
 
-## ✨ Core Features
+## Core Features
 
 ### 1. Automated Workflow
 The system manages a linear workflow:
@@ -60,7 +60,7 @@ To ensure quality mentorship, the system enforces a "Hard Cap" of 8 active proje
 
 ---
 
-## 📊 System Design
+## System Design
 
 ### Entity-Relationship Diagram (ERD)
 The database follows a normalized relational model to handle complex many-to-many relationships between faculty, students, and committees.
@@ -74,7 +74,7 @@ This diagram illustrates how data moves through the functional modules of the sy
 
 ---
 
-## 🔒 Security & Performance
+## Security & Performance
 
 * **Attack Protection:** Built-in protection against SQL Injection, XSS, and CSRF attacks.
 * **Encrypted Storage:** All passwords are hashed using **bcrypt** with unique salts.
