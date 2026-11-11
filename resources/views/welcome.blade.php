@@ -1,173 +1,273 @@
-<x-guest-layout>
-    <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            FYP Management System
-        </h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">
-            Select your role to continue
-        </p>
-    </div>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="description" content="A calmer way to manage the final year project journey — for students, supervisors, and committees.">
 
-    {{-- Flash messages --}}
-    @if(session('success'))
-        <div class="mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 rounded-lg text-sm">
-            {{ session('success') }}
+        <title>Pulse FYP — Final Year Project Management</title>
+
+        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="landing-page min-h-screen bg-white text-[#0f172a] antialiased">
+        <div class="relative isolate">
+            {{-- Header --}}
+            <header class="sticky top-0 z-40 border-b border-[#e2e8f0] bg-white/85 backdrop-blur-xl">
+                <div class="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6 lg:px-8">
+                    <a href="{{ route('welcome') }}" class="flex items-center gap-2.5" aria-label="Pulse FYP home">
+                        <img src="{{ asset('favicon.png') }}" alt="" width="32" height="32" class="h-8 w-8 rounded-full object-cover">
+                        <span class="text-[15px] font-semibold tracking-tight">Pulse FYP</span>
+                    </a>
+
+                    <nav class="hidden items-center gap-9 text-[13px] font-medium text-[#475569] md:flex" aria-label="Primary">
+                        <a href="#how" class="transition-colors hover:text-[#0f172a]">How it works</a>
+                        <a href="#features" class="transition-colors hover:text-[#0f172a]">Features</a>
+                        <a href="#roles" class="transition-colors hover:text-[#0f172a]">Roles</a>
+                    </nav>
+
+                    <a href="#roles" class="rounded-full bg-[#2563eb] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#1d4ed8]">
+                        Get started
+                    </a>
+                </div>
+            </header>
+
+            <main>
+                {{-- Hero --}}
+                <section class="mx-auto max-w-6xl px-6 pb-20 pt-20 text-center sm:pb-24 sm:pt-28 lg:px-8">
+                    <div class="animate-rise inline-flex items-center gap-2 rounded-full border border-[#dbeafe] bg-[#eff6ff] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1d4ed8]">
+                        <span class="h-1.5 w-1.5 rounded-full bg-[#2563eb]"></span>
+                        Final year, finally organized
+                    </div>
+
+                    <h1 class="animate-rise mx-auto mt-7 max-w-4xl text-[clamp(2.75rem,6.5vw,4.75rem)] font-bold leading-[1.05] tracking-[-0.035em]" style="animation-delay: 80ms">
+                        A calmer way to run your
+                        <span class="whitespace-nowrap text-[#2563eb]">final year</span> project.
+                    </h1>
+
+                    <p class="animate-rise mx-auto mt-7 max-w-xl text-[16px] leading-8 text-[#475569] sm:text-[17px]" style="animation-delay: 160ms">
+                        Pulse FYP brings ideas, reviews, deadlines, and defences into one quiet space — so everyone can focus on the work itself.
+                    </p>
+
+                    <div class="animate-rise mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row" style="animation-delay: 240ms">
+                        <a href="#how" class="inline-flex items-center justify-center rounded-full border border-[#e2e8f0] px-6 py-3.5 text-[13px] font-medium text-[#334155] transition-colors hover:border-[#bfdbfe] hover:bg-[#eff6ff]">
+                            See how it works
+                        </a>
+                    </div>
+
+                    <p class="animate-rise mt-8 text-[11px] font-medium uppercase tracking-[0.16em] text-[#64748b]" style="animation-delay: 320ms">
+                        For students &middot; Supervisors &middot; Committees
+                    </p>
+                </section>
+
+                {{-- Stats --}}
+                <section class="border-y border-[#e2e8f0] bg-[#e2e8f0]">
+                    <div class="mx-auto grid max-w-6xl grid-cols-2 gap-px sm:grid-cols-4">
+                        <div class="bg-white px-6 py-8 text-center">
+                            <p class="text-3xl font-semibold tracking-tight text-[#0f172a] sm:text-4xl">60&ndash;70%</p>
+                            <p class="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#64748b]">Faster approvals</p>
+                        </div>
+                        <div class="bg-white px-6 py-8 text-center">
+                            <p class="text-3xl font-semibold tracking-tight text-[#0f172a] sm:text-4xl">4 roles</p>
+                            <p class="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#64748b]">One shared system</p>
+                        </div>
+                        <div class="bg-white px-6 py-8 text-center">
+                            <p class="text-3xl font-semibold tracking-tight text-[#0f172a] sm:text-4xl">100%</p>
+                            <p class="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#64748b]">Workflow visibility</p>
+                        </div>
+                        <div class="bg-white px-6 py-8 text-center">
+                            <p class="text-3xl font-semibold tracking-tight text-[#0f172a] sm:text-4xl">24/7</p>
+                            <p class="mt-2 text-[11px] uppercase tracking-[0.14em] text-[#64748b]">Access anywhere</p>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- How it works --}}
+                <section id="how" class="mx-auto max-w-6xl px-6 py-24 sm:py-28 lg:px-8 lg:py-32">
+                    <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2563eb]">How it works</p>
+                            <h2 class="mt-4 max-w-sm text-4xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-5xl">
+                                From first idea to final defence.
+                            </h2>
+                            <p class="mt-5 max-w-sm text-[14px] leading-7 text-[#475569]">
+                                One continuous thread for every decision, document, and deadline — no lost emails, no paper trails.
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="group grid grid-cols-[auto_1fr_auto] items-start gap-5 border-t border-[#e2e8f0] py-7 sm:gap-7">
+                                <span class="text-sm font-semibold text-[#94a3b8]">01</span>
+                                <div>
+                                    <h3 class="text-lg font-semibold tracking-tight sm:text-xl">Shape your idea</h3>
+                                    <p class="mt-2 max-w-md text-[13px] leading-6 text-[#475569]">Submit project ideas, discover supervisor interests, and get aligned from day one.</p>
+                                </div>
+                                <span aria-hidden="true" class="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-[#e2e8f0] text-[12px] text-[#64748b] transition-colors group-hover:border-[#2563eb] group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">&rarr;</span>
+                            </div>
+
+                            <div class="group grid grid-cols-[auto_1fr_auto] items-start gap-5 border-t border-[#e2e8f0] py-7 sm:gap-7">
+                                <span class="text-sm font-semibold text-[#94a3b8]">02</span>
+                                <div>
+                                    <h3 class="text-lg font-semibold tracking-tight sm:text-xl">Build with confidence</h3>
+                                    <p class="mt-2 max-w-md text-[13px] leading-6 text-[#475569]">Track scope reviews, revisions, and feedback from one focused dashboard.</p>
+                                </div>
+                                <span aria-hidden="true" class="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-[#e2e8f0] text-[12px] text-[#64748b] transition-colors group-hover:border-[#2563eb] group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">&rarr;</span>
+                            </div>
+
+                            <div class="group grid grid-cols-[auto_1fr_auto] items-start gap-5 border-y border-[#e2e8f0] py-7 sm:gap-7">
+                                <span class="text-sm font-semibold text-[#94a3b8]">03</span>
+                                <div>
+                                    <h3 class="text-lg font-semibold tracking-tight sm:text-xl">Defend your work</h3>
+                                    <p class="mt-2 max-w-md text-[13px] leading-6 text-[#475569]">Coordinate committees and schedules with conflict-free defence sessions and digital rubrics.</p>
+                                </div>
+                                <span aria-hidden="true" class="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-[#e2e8f0] text-[12px] text-[#64748b] transition-colors group-hover:border-[#2563eb] group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">&rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- Features --}}
+                <section id="features" class="border-y border-[#e2e8f0]">
+                    <div class="mx-auto max-w-6xl px-6 py-24 sm:py-28 lg:px-8">
+                        <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+                            <div>
+                                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2563eb]">Designed for momentum</p>
+                                <h2 class="mt-4 max-w-xs text-4xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-5xl">
+                                    Less admin. More progress.
+                                </h2>
+                                <p class="mt-5 max-w-sm text-[14px] leading-7 text-[#475569]">
+                                    Pulse FYP takes care of the coordination overhead, so every person can focus on the part they do best.
+                                </p>
+                            </div>
+
+                            <div class="grid gap-x-10 gap-y-9 sm:grid-cols-2">
+                                <div>
+                                    <span class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dbeafe] bg-[#eff6ff] text-[#2563eb]">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="8.25"></circle>
+                                            <path d="M12 7.75V12l2.75 1.75"></path>
+                                        </svg>
+                                    </span>
+                                    <h3 class="mt-4 text-[14px] font-semibold">Live status tracking</h3>
+                                    <p class="mt-1.5 text-[12px] leading-6 text-[#475569]">Know exactly where every project stands, at a glance.</p>
+                                </div>
+
+                                <div>
+                                    <span class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dbeafe] bg-[#eff6ff] text-[#2563eb]">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <rect x="3.75" y="5.25" width="16.5" height="15" rx="2.5"></rect>
+                                            <path d="M3.75 9.75h16.5M8.25 3.75v3M15.75 3.75v3"></path>
+                                        </svg>
+                                    </span>
+                                    <h3 class="mt-4 text-[14px] font-semibold">Smart scheduling</h3>
+                                    <p class="mt-1.5 text-[12px] leading-6 text-[#475569]">Prevent venue and committee conflicts automatically.</p>
+                                </div>
+
+                                <div>
+                                    <span class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dbeafe] bg-[#eff6ff] text-[#2563eb]">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M6.75 3.75h7.5l3 3v13.5H6.75z"></path>
+                                            <path d="M14.25 3.75v3h3M9.75 11.25h4.5M9.75 14.25h4.5"></path>
+                                        </svg>
+                                    </span>
+                                    <h3 class="mt-4 text-[14px] font-semibold">Centralized documents</h3>
+                                    <p class="mt-1.5 text-[12px] leading-6 text-[#475569]">Keep scopes, templates, and reports easy to find.</p>
+                                </div>
+
+                                <div>
+                                    <span class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#dbeafe] bg-[#eff6ff] text-[#2563eb]">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M12 3.75l2.4 4.86 5.35.78-3.87 3.77.91 5.34L12 16l-4.79 2.5.91-5.34-3.87-3.77 5.35-.78z"></path>
+                                        </svg>
+                                    </span>
+                                    <h3 class="mt-4 text-[14px] font-semibold">Fair evaluations</h3>
+                                    <p class="mt-1.5 text-[12px] leading-6 text-[#475569]">Standardized rubrics bring clarity to every review.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- Roles --}}
+                <section id="roles" class="mx-auto max-w-6xl px-6 py-24 sm:py-28 lg:px-8 lg:py-32">
+                    <div class="mx-auto max-w-xl text-center">
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2563eb]">Your workspace is ready</p>
+                        <h2 class="mt-4 text-4xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-5xl">Choose your way in.</h2>
+                    </div>
+
+                    <div class="mx-auto mt-12 grid max-w-5xl gap-4 md:grid-cols-3">
+                        <a href="{{ route('login.role', ['role' => 'student']) }}" class="group relative rounded-2xl border border-[#e2e8f0] bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[#bfdbfe] hover:shadow-[0_18px_40px_-30px_rgba(37,99,235,0.45)]">
+                            <div class="flex items-start justify-between">
+                                <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2563eb]">Student</span>
+                                <span aria-hidden="true" class="flex h-7 w-7 items-center justify-center rounded-full border border-[#e2e8f0] text-[11px] text-[#64748b] transition-colors group-hover:border-[#2563eb] group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">&nearr;</span>
+                            </div>
+                            <h3 class="mt-8 text-xl font-semibold tracking-tight">Submit &amp; track</h3>
+                            <p class="mt-2 text-[12px] leading-6 text-[#475569]">Share ideas, manage your scope, and follow your progress.</p>
+                        </a>
+
+                        <a href="{{ route('login.role', ['role' => 'supervisor']) }}" class="group relative rounded-2xl border border-[#e2e8f0] bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[#bfdbfe] hover:shadow-[0_18px_40px_-30px_rgba(37,99,235,0.45)]">
+                            <div class="flex items-start justify-between">
+                                <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2563eb]">Supervisor</span>
+                                <span aria-hidden="true" class="flex h-7 w-7 items-center justify-center rounded-full border border-[#e2e8f0] text-[11px] text-[#64748b] transition-colors group-hover:border-[#2563eb] group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">&nearr;</span>
+                            </div>
+                            <h3 class="mt-8 text-xl font-semibold tracking-tight">Guide &amp; review</h3>
+                            <p class="mt-2 text-[12px] leading-6 text-[#475569]">Support projects, review submissions, and manage capacity.</p>
+                        </a>
+
+                        <a href="{{ route('login.role', ['role' => 'admin']) }}" class="group relative rounded-2xl border border-[#e2e8f0] bg-white p-6 transition-all hover:-translate-y-0.5 hover:border-[#bfdbfe] hover:shadow-[0_18px_40px_-30px_rgba(37,99,235,0.45)]">
+                            <div class="flex items-start justify-between">
+                                <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2563eb]">Administrator</span>
+                                <span aria-hidden="true" class="flex h-7 w-7 items-center justify-center rounded-full border border-[#e2e8f0] text-[11px] text-[#64748b] transition-colors group-hover:border-[#2563eb] group-hover:bg-[#eff6ff] group-hover:text-[#2563eb]">&nearr;</span>
+                            </div>
+                            <h3 class="mt-8 text-xl font-semibold tracking-tight">Orchestrate</h3>
+                            <p class="mt-2 text-[12px] leading-6 text-[#475569]">Manage users, committees, phases, and reports.</p>
+                        </a>
+                    </div>
+
+                    {{-- Demo --}}
+                    <div class="mx-auto mt-5 flex max-w-5xl flex-col items-start justify-between gap-4 rounded-2xl border border-[#dbeafe] bg-[#eff6ff] px-6 py-5 sm:flex-row sm:items-center">
+                        <div>
+                            <p class="text-[13px] font-semibold">Just exploring?</p>
+                            <p class="mt-0.5 text-[12px] text-[#475569]">Step into a read-only demo and see Pulse FYP from the inside.</p>
+                        </div>
+                        <a href="{{ route('guest.login', ['role' => 'student']) }}" class="group inline-flex items-center gap-2 rounded-full border border-[#bfdbfe] bg-white px-4 py-2 text-[12px] font-medium text-[#1d4ed8] transition-colors hover:border-[#2563eb]">
+                            Try the demo
+                            <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+                        </a>
+                    </div>
+                </section>
+
+                {{-- Closing CTA --}}
+                <section class="mx-auto max-w-6xl px-6 pb-24 lg:px-8">
+                    <div class="relative overflow-hidden rounded-[2rem] border border-[#dbeafe] bg-[#eff6ff] px-6 py-16 text-center sm:px-14">
+                        <div class="relative">
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2563eb]">Make progress visible</p>
+                            <h2 class="mx-auto mt-4 max-w-lg text-4xl font-bold leading-[1.08] tracking-[-0.03em] text-[#0f172a] sm:text-5xl">
+                                Ready when you are.
+                            </h2>
+                            <p class="mx-auto mt-4 max-w-md text-[13px] leading-7 text-[#475569]">
+                                Explore a read-only workspace and see how Pulse FYP feels from the inside.
+                            </p>
+                            <div class="mt-8 flex justify-center">
+                                <a href="{{ route('guest.login', ['role' => 'student']) }}" class="inline-flex items-center justify-center gap-2 rounded-full bg-[#2563eb] px-6 py-3 text-[13px] font-medium text-white transition-colors hover:bg-[#1d4ed8]">
+                                    Explore the demo
+                                    <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="border-t border-[#e2e8f0] bg-white">
+                <div class="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 text-[11px] text-[#64748b] sm:flex-row sm:items-center sm:justify-between lg:px-8">
+                    <p>&copy; {{ date('Y') }} Pulse FYP &middot; SSJ-Pulse Enterprise</p>
+                    <p>Make progress visible.</p>
+                </div>
+            </footer>
         </div>
-    @endif
-    @if(session('error'))
-        <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-800 dark:text-red-200 rounded-lg text-sm">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <div class="space-y-4">
-        <!-- Student Login Card -->
-        <a href="{{ route('login.role', ['role' => 'student']) }}" 
-           id="student-login-btn"
-           class="block w-full p-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-lg shadow-lg transform hover:scale-[1.02] transition-all duration-200">
-            <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-lg font-semibold text-white">Student</p>
-                    <p class="text-sm text-blue-100">Access your projects &amp; submissions</p>
-                </div>
-                <div class="flex-shrink-0">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </div>
-            </div>
-        </a>
-
-        <!-- Supervisor Login Card -->
-        <a href="{{ route('login.role', ['role' => 'supervisor']) }}" 
-           id="supervisor-login-btn"
-           class="block w-full p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-lg shadow-lg transform hover:scale-[1.02] transition-all duration-200">
-            <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-lg font-semibold text-white">Supervisor</p>
-                    <p class="text-sm text-emerald-100">Manage students &amp; review projects</p>
-                </div>
-                <div class="flex-shrink-0">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </div>
-            </div>
-        </a>
-
-        <!-- Admin Login Card -->
-        <a href="{{ route('login.role', ['role' => 'admin']) }}" 
-           id="admin-login-btn"
-           class="block w-full p-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg shadow-lg transform hover:scale-[1.02] transition-all duration-200">
-            <div class="flex items-center space-x-4">
-                <div class="flex-shrink-0">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-lg font-semibold text-white">Administrator</p>
-                    <p class="text-sm text-purple-100">System administration &amp; management</p>
-                </div>
-                <div class="flex-shrink-0">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </div>
-            </div>
-        </a>
-    </div>
-
-    {{-- ============================================================
-         GUEST / DEMO MODE SECTION
-         ============================================================ --}}
-    <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <div class="text-center mb-4">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-xs font-semibold rounded-full uppercase tracking-wide">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                </svg>
-                Try a Demo
-            </span>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Explore the system without creating an account. Actions that modify data will prompt you to sign in.
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-
-            {{-- Demo: Student --}}
-            <a href="{{ route('guest.login', ['role' => 'student']) }}"
-               id="demo-student-btn"
-               class="group flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-dashed border-blue-300 dark:border-blue-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
-                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                    </svg>
-                </div>
-                <div class="text-center">
-                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">Student View</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">Projects &amp; submissions</div>
-                </div>
-                <span class="text-xs font-medium text-blue-600 dark:text-blue-400 group-hover:underline">
-                    Try as Student →
-                </span>
-            </a>
-
-            {{-- Demo: Supervisor --}}
-            <a href="{{ route('guest.login', ['role' => 'supervisor']) }}"
-               id="demo-supervisor-btn"
-               class="group flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-700 hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all duration-200">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
-                </div>
-                <div class="text-center">
-                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">Supervisor View</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">Review &amp; approvals</div>
-                </div>
-                <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400 group-hover:underline">
-                    Try as Supervisor →
-                </span>
-            </a>
-
-            {{-- Demo: Admin --}}
-            <a href="{{ route('guest.login', ['role' => 'admin']) }}"
-               id="demo-admin-btn"
-               class="group flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-dashed border-purple-300 dark:border-purple-700 hover:border-purple-500 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-200">
-                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </div>
-                <div class="text-center">
-                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">Admin View</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">System management</div>
-                </div>
-                <span class="text-xs font-medium text-purple-600 dark:text-purple-400 group-hover:underline">
-                    Try as Admin →
-                </span>
-            </a>
-        </div>
-
-        <p class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
-            Demo sessions are read-only. No data will be modified.
-        </p>
-    </div>
-</x-guest-layout>
+    </body>
+</html>
