@@ -88,7 +88,13 @@ class FypPhaseController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max: 100'],
+            'slug' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('fyp_phases', 'slug')
+                    ->where(fn ($query) => $query->where('semester', $request->input('semester'))),
+            ],
             'semester' => ['required', 'string', 'max: 100'],
             'order' => ['required', 'integer', 'min:1', 'max:10'],
             'start_date' => ['required', 'date'],
@@ -97,17 +103,6 @@ class FypPhaseController extends Controller
             'allow_late' => ['boolean'],
             'is_active' => ['boolean'],
         ]);
-
-        // Check for duplicate slug in same semester
-        $exists = FypPhase::where('semester', $validated['semester'])
-                          ->where('slug', $validated['slug'])
-                          ->exists();
-
-        if ($exists) {
-            return back()
-                ->withInput()
-                ->withErrors(['slug' => 'This phase already exists for the selected semester.']);
-        }
 
         // Check for overlapping dates in same semester
         $overlapping = FypPhase::where('semester', $validated['semester'])
@@ -216,7 +211,14 @@ class FypPhaseController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max: 255'],
-            'slug' => ['required', 'string', 'max:100'],
+            'slug' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('fyp_phases', 'slug')
+                    ->where(fn ($query) => $query->where('semester', $request->input('semester')))
+                    ->ignore($phase->id),
+            ],
             'semester' => ['required', 'string', 'max:100'],
             'order' => ['required', 'integer', 'min:1', 'max:10'],
             'start_date' => ['required', 'date'],
@@ -225,18 +227,6 @@ class FypPhaseController extends Controller
             'allow_late' => ['boolean'],
             'is_active' => ['boolean'],
         ]);
-
-        // Check for duplicate slug in same semester (excluding current phase)
-        $exists = FypPhase::where('semester', $validated['semester'])
-                          ->where('slug', $validated['slug'])
-                          ->where('id', '!=', $phase->id)
-                          ->exists();
-
-        if ($exists) {
-            return back()
-                ->withInput()
-                ->withErrors(['slug' => 'This phase already exists for the selected semester.']);
-        }
 
         $validated['allow_late'] = $request->boolean('allow_late');
         $validated['is_active'] = $request->boolean('is_active', true);

@@ -70,12 +70,12 @@
 
                         {{-- Semester --}}
                         <div class="mb-4">
-                            <label for="semester" class="block text-sm font-medium text-gray-700 dark: text-gray-300 mb-1">
+                            <label for="semester" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Semester <span class="text-red-500">*</span>
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" name="semester" id="semester" value="{{ old('semester') }}" required list="semester-list"
-                                       class="flex-1 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark: text-gray-300 shadow-sm focus:border-indigo-500 focus: ring-indigo-500"
+                                       class="flex-1 rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                        placeholder="e.g., Spring 2026">
                                 <datalist id="semester-list">
                                     @foreach($existingSemesters as $sem)

@@ -177,7 +177,7 @@
                                                     <form action="{{ route('admin.phases.toggle-status', $phase) }}" method="POST" class="inline">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="{{ $phase->is_active ? 'text-green-600 hover: text-green-800' : 'text-gray-400 hover:text-gray-600' }}" title="{{ $phase->is_active ? 'Deactivate' :  'Activate' }}">
+                                                        <button type="submit" class="{{ $phase->is_active ? 'text-green-600 hover:text-green-800' : 'text-gray-400 hover:text-gray-600' }}" title="{{ $phase->is_active ? 'Deactivate' :  'Activate' }}">
                                                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9. 555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
                                                             </svg>
@@ -186,9 +186,9 @@
                                                     <form action="{{ route('admin.phases.destroy', $phase) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this phase?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover: text-red-900 dark:text-red-400 dark:hover:text-red-300" title="Delete">
+                                                        <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" title="Delete">
                                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-. 867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                             </svg>
                                                         </button>
                                                     </form>
